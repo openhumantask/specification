@@ -176,6 +176,12 @@ form:
 
 Represents the definition of a view.
 
+#### Examples
+
+```yaml
+
+```
+
 #### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
@@ -189,7 +195,9 @@ Represents the definition of a view.
 
 Represents the definition of a notification, which is use to communicate the status of the task to users.
 
-An example of such a notification would be a reminder to execute a start, which can be defined as follows:
+#### Examples
+
+*An example of such a notification would be a reminder to execute a start, which can be defined as follows:*
 
 ```yaml
 ...
@@ -202,7 +210,7 @@ notifications:
 ...
 ```
 
-An example of a notification using an inline view definition:
+*An example of a notification using an inline view definition:*
 
 ```yaml
 ...
@@ -229,9 +237,11 @@ notifications:
 
 Represents the definition of a deadline to reach a given human task status milestone. 
 
-For example, one might want to send a reminder notification if an important task has not started before 30 minutes.
+#### Examples
 
-The following sample demonstrates a deadline to achieve this:
+*For example, one might want to send a reminder notification if an important task has not started before 30 minutes.*
+
+*The following sample demonstrates a deadline to achieve this:*
 
 ```yaml
 ...
@@ -263,7 +273,9 @@ deadlines:
 
 Represents the definition of an escalation that occurs if the human task has not reached a given status before a specific date and time, or before a given amount of time.
 
-Example of an escalation that reassigns the task to Alan if the the task's amount is higher than 10,000.00:
+#### Examples
+
+*Example of an escalation that reassigns the task to Alan if the the task's amount is higher than 10,000.00:*
 
 ```yaml
 ...
@@ -310,6 +322,12 @@ There are 3 different types of escalation actions:
 
 Sends a notification to a given list of recipients as the result of an elapsed deadline.
 
+#### Examples
+
+```yaml
+
+```
+
 #### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
@@ -324,6 +342,12 @@ Sends a notification to a given list of recipients as the result of an elapsed d
 
 Configures a reassignment to perform as the result of an elapsed deadline.
 
+#### Examples
+
+```yaml
+
+```
+
 #### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
@@ -335,6 +359,12 @@ Configures a reassignment to perform as the result of an elapsed deadline.
 #### Description
 
 Configures a subtask to create as the result of an elapsed deadline.
+
+#### Examples
+
+```yaml
+
+```
 
 #### Properties
 
