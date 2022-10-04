@@ -56,7 +56,7 @@ Defines a human task and configures its behaviors.
 | description | `object` | `no` | `yes` | The mappings of localized descriptions to their two-letter **ISO 639-1** language names. |
 | inputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate inputs of the human task definition's instances. | 
 | outputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate outputs of the human task definition's instances. | 
-| form | [`formDefinition`](#form-definitions) | `yes` | `no` | Configures the task's form. |
+| form | `string`<br>[`formDefinition`](#form-definitions) | `yes` | `no` | Configures the task's form.<br>*If a `string`, an uri referencing the external [form definition](#form-definition).*<br>*If an `object`, the inline configuration of the human task's [form definition](#form-definition).* |
 | notifications | [`notification[]`](#notification-definitions) | `no` | `no` | An array containing the human task's [`notifications`](#notification-definitions). |
 | deadlines | [`deadlineDefinition[]`](#deadline-definitions) | `no` | `no` | An array containing the [`deadlines`](#deadline-definitions) of the human task's instances. |
 | annotations | `array`<br>`object` | `no` | `no` | An array of string-based key/value pairs containing helpful terms used to describe the human task intended purpose, subject areas, or other important qualities.
@@ -121,8 +121,8 @@ Represents the definition of an human task form, which is used to collect data f
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| type | `string` | true | true | The view type.<br>*Defaults to [`md`](https://www.markdownguide.org/).*<br>*Can be a [runtime expression](#runtime-expression).* |
-| template | `string` | true | true | The view template.<br>*Can be a (or contain) [runtime expression(s)](#runtime-expression).* |
+| data | [`formDataDefinition`](#form-data-definitions) | `no` | `no` | Configures the form's data |
+| view | [`viewDefinition`](#view-definitions) | `yes` | `no` | Configures the form's view |
 
 #### Examples
 
@@ -188,12 +188,56 @@ Represents the definition of a view.
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | type | `string` | true | true | The view type.<br>*Defaults to [`md`](https://www.markdownguide.org/).*<br>*Can be a [runtime expression](#runtime-expression).* |
-| template | `string` | true | true | The view template.<br>*Can be a (or contain) [runtime expression(s)](#runtime-expression).* |
+| template | `string`<br>`object` | true | true | The view template.<br>*If a `string`, the raw template contents.*<br>*If an `object`, the inline template.*<br>*Can be a (or contain) [runtime expression(s)](#runtime-expression).* |
 
 #### Examples
 
-```yaml
+*Example of a view definition using a raw template (`string`):*
 
+```yaml
+  view:
+    type: jsonform
+    template: >
+      {
+        "type": "VerticalLayout",
+        "elements": [
+        {
+          "type": "Label",
+          "text": "Review new client profile"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/client/properties/firstName"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/client/properties/lastName"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/client/properties/email"
+        }]
+      }
+```
+
+*Example of the same view definition, using an inline template (`object`):*
+
+```yaml
+...
+  view:
+    type: jsonform
+    template:
+      type: VerticalLayout
+      elements:
+      - type: Label
+        text: Review new client profile
+      - type: Control
+        scope: "#/properties/client/properties/firstName"
+      - type: Control
+        scope: "#/properties/client/properties/lastName"
+      - type: Control
+        scope: "#/properties/client/properties/email"
+...
 ```
 
 ### Notification Definitions
