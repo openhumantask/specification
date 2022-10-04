@@ -26,6 +26,7 @@
     - [People Assignments Definitions](#people-assignments-definitions)
     - [People Reference Definitions](#people-reference-definitions)
     - [Users Reference Definitions](#users-reference-definitions)
+    - [Claim Filter Definitions](#claim-filter-definitions)
     - [Logical People Group Definitions](#logical-people-group-definitions)
     - [Form Definitions](#form-definitions)
     - [View Definitions](#view-definitions)
@@ -36,6 +37,12 @@
       - [Notification](#notification-escalation-action-definitions)
       - [Reassignment](#reassignment-escalation-action-definitions)
       - [SubTask](#subtask-escalation-action-definitions)
+    - [Human Tasks](#human-tasks)
+    - [People Assignments](#people-assignments)
+    - [User References](#user-references)
+    - [Forms](#forms)
+    - [Attachments](#attachments)
+    - [Comments](#comments)
 
 ## Introduction
 
@@ -53,7 +60,10 @@ Defines the potential initiators of the task. Implementations should allow users
 
 ###### Permissions
 
-- Instanciate the task.
+- [x] Instanciate task.
+- [x] Patch input data *(only before task has been claimed)*.
+- [x] Add attachment *(only before task has been claimed)*.
+- [x] Add comment *(only before task has been claimed)*.
 
 ##### Potential owners
 
@@ -63,10 +73,27 @@ Defines the persons who receive the task so that they can claim and complete it.
 
 ###### Permissions
 
-- Claim tasks.
-- Change priority *(only before task has been claimed)*.
-- Add attachment *(only before task has been claimed)*.
-- Add comment *(only before task has been claimed)*.
+- [x] Claim task.
+- [x] Change priority *(only before task has been claimed)*.
+- [x] Add attachment *(only before task has been claimed)*.
+- [x] Add comment *(only before task has been claimed)*.
+
+##### Actual owner
+
+###### Description
+
+An actual owner of a task is the person actually performing the task. When task is performed, the actual owner can execute actions, such as revoking the claim, forwarding the task, suspending and resuming the task execution or changing the priority of the task.
+
+###### Permissions
+
+- [x] Revoke task.
+- [x] Skip task. 
+- [x] Delegate/forward task.
+- [x] Suspend task.
+- [x] Resume task. 
+- [x] Change priority.
+- [x] Add attachment.
+- [x] Add comment.
 
 ##### Excluded owners
 
@@ -86,11 +113,13 @@ Defines the people ultimately responsible for the oversight and outcome of the t
 
 ###### Permissions
 
-- Add/remove attachment.
-- Add comment.
-- Receive notifications.
-- Forward tasks.
-- Release tasks.
+- [x] Add/remove attachment.
+- [x] Add comment.
+- [x] Receive notifications.
+- [x] Patch input/output data.
+- [x] Forward task.
+- [x] Revoke task.
+- [x] Change priority.
 
 ##### Business administrators
 
@@ -100,12 +129,14 @@ Business administrators play the same role as task stakeholders but at task defi
 
 ###### Permissions
 
-- Add/remove attachment.
-- Add comment.
-- Receive notifications.
-- Forward tasks.
-- Release tasks.
-- Edit task definition.
+- [x] Add/remove attachment.
+- [x] Add comment.
+- [x] Receive notifications.
+- [x] Patch input/output data.
+- [x] Forward task.
+- [x] Revoke task.
+- [x] Change priority.
+- [x] Edit task definition.
 
 #### Lifecycle
 
@@ -260,7 +291,7 @@ Represents the definition used to configure people assignments for instance of t
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| [potentialOwners](#potential-owners) | [`peopleReferenceDefinition[]`](#people-reference-definitions) | `yes` | `no` | The [potential owners](#potential-owners) of the task.<br>*Must contain at least one [`people reference`](#people-reference-definitions).* |
+| [potentialOwners](#potential-owners) | [`peopleReferenceDefinition[]`](#people-reference-definitions) | `no` | `no` | The [potential owners](#potential-owners) of the task. |
 | [excludedOwners](#excluded-owners) | [`peopleReferenceDefinition[]`](#people-reference-definitions) | `no` | `no` | The [excluded owners](#excluded-owners) of the task. |
 | [potentialTaskInitiators](#potential-task-initiators) | [`peopleReferenceDefinition[]`](#people-reference-definitions) | `no` | `no` | The [potential initiators](#potential-task-initiators) of the task. |
 | [taskStakeholders](#stakeholders) | [`peopleReferenceDefinition[]`](#people-reference-definitions) | `no` | `no` | The [stakeholders](#stakeholders) of the task. |
@@ -322,9 +353,9 @@ Represents an object used to reference multiple users based on given parameters.
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| withClaims | [`claimFilterDefinition[]`](#claim-filter-definitions) | `depends` | `no` | The claims to filter by the users to reference. |
-| inGroup | `string` | `depends` | `yes` | The logical group that defines the users to reference. |
-| [inGenericRole](#generic-task-roles) | `enum` | `depends` | `no` | The [generic role](#generic-task-roles) that defines the users to reference.<br>*Assignments of users to generic roles are delcared in the [human task definition's `peopleAssignments`](#human-task-definitions) property.*  |
+| withClaims | [`claimFilterDefinition[]`](#claim-filter-definitions) | `depends` | `no` | The claims to filter by the users to reference.<br>Required if `inGroup` and `inGenericRole` have not been set, otherwise ignored. |
+| inGroup | `string` | `depends` | `yes` | The logical group that defines the users to reference.<br>Required if `withClaims` and `inGenericRole` have not been set, otherwise ignored. |
+| [inGenericRole](#generic-task-roles) | `enum` | `depends` | `no` | The [generic role](#generic-task-roles) that defines the users to reference.<br>Required if `withClaims` and `inGroup` have not been set, otherwise ignored.<br>*Assignments of users to generic roles are delcared in the [human task definition's `peopleAssignments`](#human-task-definitions) property.*  |
 
 ###### Examples
 
@@ -355,6 +386,50 @@ Represents an object used to reference multiple users based on given parameters.
 ...
 - users:
     inGroup: regional-clerks
+...
+```
+
+#### Claim Filter Definitions
+
+###### Description
+
+Defines a logical group of people which can be referenced in the task's scope.
+
+###### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| type | `string` | `depends` | `yes` | The type of the claim matching users must own.<br>*Required if `value` has not been set.*<br>*If used in conjunction with the `value` property, filters users that have a claim of the specified type, with the specified value.*<br>*Supports [runtime expressions](#runtime-expressions).<br>Supports [regular expressions](https://www.regular-expressions.info/).* |
+| value | `string` | `depends` | `yes` | Specifies a claim value matching users must own.<br>*Required if `type` has not been set.*<br>*If the `type` property has not been set, filters users that have a claim of any type containing the specified value.*<br>*Supports [runtime expressions](#runtime-expressions).<br>Supports [regular expressions](https://www.regular-expressions.info/).*
+
+###### Examples
+
+*Example of a claim filter definition that matches users that own at least one claim of type `task:perform`:*
+```yaml
+...
+- type: 'task:perform'
+...
+```
+
+*Example of a claim filter definition that matches users that own at least one claim that contains the value `/openbank/departments/credits`:*
+```yaml
+...
+- value: '/openbank/departments/credits'
+...
+```
+
+*Example of a claim filter definition that matches users that own at least one claim matching the [`regex pattern`](https://www.regular-expressions.info/) `^\/openbank\/departments\/credits\/`:*
+```yaml
+...
+- value: '^\/openbank\/departments\/credits\/'
+...
+```
+
+*Example of a claim filter definition that matches users that own at least one claim of type `openbank:department` with a value matching the [`regex pattern`](https://www.regular-expressions.info/) `^\/openbank\/departments\/credits\/`:*
+```yaml
+...
+- type: openbank:department
+  value: '^\/openbank\/departments\/credits\/'
 ...
 ```
 
@@ -393,8 +468,8 @@ Represents the definition of an human task form, which is used to collect data f
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| data | [`formDataDefinition`](#form-data-definitions) | `no` | `no` | Configures the form's data |
-| view | [`viewDefinition`](#view-definitions) | `yes` | `no` | Configures the form's view |
+| data | [`formDataDefinition`](#form-data-definitions) | `no` | `no` | Configures the form's data. |
+| views | [`viewDefinition[]`](#view-definitions) | `yes` | `no` | Configures the form's views.<br>*Must contain at least one [`view definition`](#view-definitions).* |
 
 ###### Examples
 
@@ -523,7 +598,7 @@ Represents the definition of a notification, which is use to communicate the sta
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | name | `string` | `yes` | `no` | The name used to reference the notification definition.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
-| view | `string`<br>`viewDefinition` | `yes` | `yes` | Configures the notification's view.<br>*If a `string`, represents the unique identifier of the template to use, using the `{namespace}.{name}:{version}` format.<br>If a `viewDefinition`, configures the view inline.<br>*Can be a [runtime expression](#runtime-expression).* |
+| views | [`viewDefinition[]`](#view-definitions) | `yes` | `yes` | Configures the notification's views.<br>*Must contain at least one [`view definition`](#view-definitions).* |
 | input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to build the notification's input data based on the human task's data.<br>If an `object`, represents the input data of the notification to produce. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
 | recipients | [`peopleAssignmentDefinition[]`](#people-assignment-definition) | `yes` | `no` | An array that contains the notification's recipients.<br>*Must contain at least one [recipient](#people-assignment-definition).*
 
@@ -714,9 +789,9 @@ Configures a subtask to create as the result of an elapsed deadline.
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| refName | `string` | `yes` | `yes` | A literal or a [runtime expression](#runtime-expression) that references the [`subtask definition`](#subtask-definition) to create. |
-| input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to build the subtask's input data based on the human task's data.<br>If an `object`, represents the input data of the subtask to create. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
-| assignments  | [`peopleAssignmentDefinition`](#people-assignment-definition) | `no` | `no` | An object used to override the referenced [`subtask definition`](#subtask-definition)'s [`assignments`](#people-assignment-definition) |
+| refName | `string` | `yes` | `yes` | A literal or a [runtime expression](#runtime-expressions) that references the [`subtask definition`](#subtask-definitions) to create. |
+| input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expressions) used to build the subtask's input data based on the human task's data.<br>If an `object`, represents the input data of the subtask to create. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
+| peopleAssignments  | [`peopleAssignmentsDefinition`](#people-assignments-definitions) | `no` | `no` | An object used to override the referenced [`subtask definition`](#subtask-definition)'s [`assignments`](#people-assignment-definition) |
 
 ###### Examples
 
@@ -731,4 +806,217 @@ deadlines:
         action:
           subtask:
             refName: update-rates-offer
+```
+
+#### Human Tasks
+
+###### Description
+
+Represents an instance of a [human task definition](#human-task-definitions).
+
+###### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| id | `string` | `yes` | `no` | A string that globally and uniquely identifies the human task. <br>*MUST be lowercase and must only contain alphanumeric characters, with the exception of the `.` and `-` characters. <br>It is recommended for the id to be automatically generated by implementations, following the `{humanTaskDefinitionId}.{key}` format.* |
+| key | `string` | `yes` | `no` | A string that uniquely identifies the human task amongst other instances of the same definition.<br>The `key` is a unique business identifier of the task, and should therefore ideally correspond to a relevant data in the task's context. For example, in an order review task, the key could be the id of the order to review.<br>Automatically generated by the [definition's](#human-task-definitions) `key` property, if any, or a magic string such as an UUID.<br>The generated key can be overriden when creating a new instance of an [human task definition's](#human-task-definitions), which can be used to correlate the task's cloud events in an async scenario.<br>*The key must be unique amongst instances of a specific human task definition.* |
+| createdAt | `dateTimeOffset` | `yes` | `no` | The **ISO 8601** date and time at which the user task has been created |
+| status | `enum` | `yes` | `no` | The status of the task.<br>Possibles values are `created`, `ready`, `reserved`, `inProgress`, `completed`, `obsolete` |
+| peopleAssignments | [`peopleAssignment[]`](#people-assignments) | `yes` | `no` | The processed [people assignments definition](#people-assignments-definitions) containing the resolved users and their assignations. |
+| input | `object` | `no` | `no` | The input data the task has been instanciated with. |
+| form | [`form`](#form) | `yes` | `no` | The task's form. |
+| attachments | [`attachment[]`](#attachments) | `no` | `no` | The task's attachments. |
+| comments | [`comment[]`](#comments) | `no` | `no` | The task's comments. |
+
+###### Examples
+
+```yaml
+id: 'openbank.loan-management.loan-approval-request:1.0.5-1236547890'
+key: 1236547890
+createdAt: '2008-09-22T14:01:54.9571247Z+00:00'
+status: created
+peopleAssignments:
+  peopleAssignments:
+    potentialOwners:
+        - user:
+            id: 69
+            name: Alan Devito
+        - user:
+            id: 6969
+            name: Sheniqua Johnson
+input:
+  client:
+    firstName: Karen
+    lastName: March
+    nationality: USA
+    dateOfBirth: 08/15/1985
+  request:
+    type: credit
+    creditType: installment
+    submittedAt: '2009-04-22T13:07:04.9185657Z+02:00'
+    amount: 120,000.00
+    currency: 
+      code: USD
+      symbol: $
+    motive:
+      other: Renovate pool house
+    broker:
+      type: in-house
+      identity:
+        id: 522
+        name: Jason Smith
+form:
+  data:
+    requestReviewed: false
+  views:
+    - type: jsonform
+      status: rendered
+      template: ...
+attachments:
+  - id: 2301
+    createdAt: '2009-04-22T13:07:04.9185657Z+02:00'
+    author:
+      id: 522
+      name: Jason Smith
+    resource:
+      name: 
+      contentType: application/pdf
+      uri: https://test.com/downloads/resources/2301/raw
+comments:
+  - id: 65487
+    createdAt: '2009-04-22T13:07:04.9185657Z+02:00'
+    author:
+      id: 522
+      name: Jason Smith
+    content: >
+      The client has a spotless record, and due diligence demonstrates that she has solid assets, and a substancial reserve of cash.
+```
+
+#### People Assignments
+
+###### Description
+
+Represents a processed [people assignments definition](#people-assignments-definitions) containing the resolved users and their assignations.
+
+###### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| [potentialOwners](#potential-owners) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [potential owners](#potential-owners) of the task. |
+| [excludedOwners](#excluded-owners) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [excluded owners](#excluded-owners) of the task. |
+| [potentialTaskInitiators](#potential-task-initiators) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [potential initiators](#potential-task-initiators) of the task. |
+| [taskStakeholders](#stakeholders) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [stakeholders](#stakeholders) of the task. |
+| [businessAdministrators](#businessAdministrators) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [business administrators](#business-administrators) of the task. |
+| [notificationRecipents](#notification-recipents) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [recipients of all notifications](#notification-recipents) produced by the task. |
+| groups | [`logicalPeopleGroup[]`](#logical-people-groups) | `no` | `no` | An array containing the resolved [`logical people groups`](#logical-people-groups) defined for the task's scope. |
+
+###### Examples
+
+```yaml
+
+```
+
+#### User References
+
+###### Description
+
+Represents a reference to an user.
+
+###### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| id | `string` | `yes` | `no` | The user's unique identifier, as specified by its `sub` JWT claim type. |
+| name | `string` | `no` | `no` | The user's name, as specified by its `preferred_username` JWT claim type. |
+
+###### Examples
+
+```yaml
+...
+id: 1234567890
+name: John Smith
+...
+```
+
+#### Logical People Groups
+
+###### Description
+
+Represents a reference to a logical people group.
+
+###### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| name | `string` | `yes` | `no` | The name of the resolved logical user group.<br>*MUST be lowercase and must only contain alphanumeric characters, with the exception of the `-` character. |
+| members | [`userReference[]`](#user-references) | `yes` | `no` | An array containing the resolved members of the group. |
+
+###### Examples
+
+```yaml
+...
+name: regional-clerks
+members:
+  - id: 1234567890
+    name: John Smith
+  - id: 0987654321
+    name: Jane Doe
+...
+```
+
+#### Forms
+
+###### Description
+
+*Coming soon...*
+
+###### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+
+*Coming soon...*
+
+###### Examples
+
+```yaml
+
+```
+
+#### Attachments
+
+###### Description
+
+*Coming soon...*
+
+###### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+
+*Coming soon...*
+
+###### Examples
+
+```yaml
+
+```
+
+#### Comments
+
+###### Description
+
+*Coming soon...*
+
+###### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+
+*Coming soon...*
+
+###### Examples
+
+```yaml
+
 ```
