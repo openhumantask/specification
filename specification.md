@@ -54,13 +54,15 @@ Defines a human task and configures its behaviors.
 | title | `object` | `no` | `yes` | The mappings of localized titles to their two-letter **ISO 639-1** language names. Titles are used as human task localized display name. |
 | subject | `object` | `no` | `yes` | The mappings of localized subjects to their two-letter **ISO 639-1** language names. |
 | description | `object` | `no` | `yes` | The mappings of localized descriptions to their two-letter **ISO 639-1** language names. |
-| inputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate inputs of the human task definition's instances | 
-| outputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate outputs of the human task definition's instances | 
-| form | [`formDefinition`](#form-definition) | `yes` | `no` | Configures the task's form. |
-| notifications | [`notification[]`](#notification-definition) | `no` | `no` | An array containing the human task's [`notifications`](#notification-definition) |
-| deadlines | [`deadlineDefinition[]`](#deadline-definition) | `no` | `no` | An array containing the [`deadlines`](#deadline-definition) of the human task's instances |
+| inputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate inputs of the human task definition's instances. | 
+| outputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate outputs of the human task definition's instances. | 
+| form | [`formDefinition`](#form-definitions) | `yes` | `no` | Configures the task's form. |
+| notifications | [`notification[]`](#notification-definitions) | `no` | `no` | An array containing the human task's [`notifications`](#notification-definitions). |
+| deadlines | [`deadlineDefinition[]`](#deadline-definitions) | `no` | `no` | An array containing the [`deadlines`](#deadline-definitions) of the human task's instances. |
+| annotations | `array`<br>`object` | `no` | `no` | An array of string-based key/value pairs containing helpful terms used to describe the human task intended purpose, subject areas, or other important qualities.
+| metadata | `object` | `no` | `no` | An object used to provide additional unstructured information about the human task definition. May be used by implementations to define additional functionality. | 
 
-**YAML example definition**
+### Examples
 
 ```yaml
 id: openbank.loan-management.loan-approval-request:1.0.5
@@ -71,7 +73,7 @@ specVersion: '0.1'
 expressionLanguage: jq
 key: '${ .case.reference }'
 title:
-  fr: Examiner reqûete de crédit
+  fr: Examiner requête de crédit
   en: Review loan request
 subject:
   fr: Crédits à tempérament
@@ -103,6 +105,10 @@ outcomes:
   - name: approved
     condition: '${ .output.approved and .output.approverId != null }'
   - name: rejected
+annotations:
+  tags: loan approval
+metadata:
+  x-obms-css-lib: adminkit
 ```
 
 ### Form Definitions
@@ -110,6 +116,15 @@ outcomes:
 #### Description
 
 Represents the definition of an human task form, which is used to collect data from users.
+
+#### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| type | `string` | true | true | The view type.<br>*Defaults to [`md`](https://www.markdownguide.org/).*<br>*Can be a [runtime expression](#runtime-expression).* |
+| template | `string` | true | true | The view template.<br>*Can be a (or contain) [runtime expression(s)](#runtime-expression).* |
+
+#### Examples
 
 *Example of a form with an inline view:*
 
@@ -162,19 +177,18 @@ form:
 ...
 ```
 
+### View Definitions
+
+#### Description
+
+Represents the definition of a view.
+
 #### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | type | `string` | true | true | The view type.<br>*Defaults to [`md`](https://www.markdownguide.org/).*<br>*Can be a [runtime expression](#runtime-expression).* |
 | template | `string` | true | true | The view template.<br>*Can be a (or contain) [runtime expression(s)](#runtime-expression).* |
-
-
-### View Definitions
-
-#### Description
-
-Represents the definition of a view.
 
 #### Examples
 
@@ -182,18 +196,20 @@ Represents the definition of a view.
 
 ```
 
-#### Properties
-
-| Name | Type | Required | Runtime<br>Expression | Description |
-|------|:----:|:--------:|:---------------------:|-------------|
-| type | `string` | true | true | The view type.<br>*Defaults to [`md`](https://www.markdownguide.org/).*<br>*Can be a [runtime expression](#runtime-expression).* |
-| template | `string` | true | true | The view template.<br>*Can be a (or contain) [runtime expression(s)](#runtime-expression).* |
-
 ### Notification Definitions
 
 #### Description
 
 Represents the definition of a notification, which is use to communicate the status of the task to users.
+
+#### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| name | `string` | `yes` | `no` | The name used to reference the notification definition.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
+| view | `string`<br>`viewDefinition` | `yes` | `yes` | Configures the notification's view.<br>*If a `string`, represents the unique identifier of the template to use, using the `{namespace}.{name}:{version}` format.<br>If a `viewDefinition`, configures the view inline.<br>*Can be a [runtime expression](#runtime-expression).* |
+| input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to build the notification's input data based on the human task's data.<br>If an `object`, represents the input data of the notification to produce. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
+| recipients | [`peopleAssignmentDefinition[]`](#people-assignment-definition) | `yes` | `no` | An array that contains the notification's recipients.<br>*Must contain at least one [recipient](#people-assignment-definition).*
 
 #### Examples
 
@@ -204,7 +220,7 @@ Represents the definition of a notification, which is use to communicate the sta
 notifications:
   - name: execute-task-reminder
     view: openbank.loan-management.notifications.task-reminder:1.0.0
-    input: '${ .input }
+    input: '${ .input }'
     recipients:
       - user: alan
 ...
@@ -222,20 +238,21 @@ notifications:
 ...
 ```
 
-#### Properties
-
-| Name | Type | Required | Runtime<br>Expression | Description |
-|------|:----:|:--------:|:---------------------:|-------------|
-| name | `string` | `yes` | `no` | The name used to reference the notification definition.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
-| view | `string`<br>`viewDefinition` | `yes` | `yes` | Configures the notification's view.<br>*If a `string`, represents the unique identifier of the template to use, using the `{namespace}.{name}:{version}` format.<br>If a `viewDefinition`, configures the view inline.<br>*Can be a [runtime expression](#runtime-expression).* |
-| input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to build the notification's input data based on the human task's data.<br>If an `object`, represents the input data of the notification to produce. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
-| recipients | [`peopleAssignmentDefinition[]`](#people-assignment-definition) | `yes` | `no` | An array that contains the notification's recipients.<br>*Must contain at least one [recipient](#people-assignment-definition).*
-
 ### Deadline Definitions
 
 #### Description
 
 Represents the definition of a deadline to reach a given human task status milestone. 
+
+#### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| name | `string` | `yes` | `no` | The name of the deadline. <br />*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
+| type | `enum` | `yes` | `no` | The deadline type.<br>*Possibles values are: `start` and `completion`* |
+| until | `string` | `depends` | `no` | The **ISO 8601** date and time after which the deadline triggers the defined escalation.<br>*Is required if `duration` has not been set.* |
+| duration | `dateTime` | `depends` | `no` | The **ISO 8601** duration after which the deadline triggers the defined escalation.<br>*Is required if `until` has not been set.* |
+| escalations | [`escalationDefinition[]`](#escalation-definition) | `yes` | `no` | An array containing the escalations that may be performed when the deadline has been reached.<br>Must contain at least one escalation definition. |
 
 #### Examples
 
@@ -257,36 +274,11 @@ deadlines:
 ...
 ```
 
-#### Properties
-
-| Name | Type | Required | Runtime<br>Expression | Description |
-|------|:----:|:--------:|:---------------------:|-------------|
-| name | `string` | `yes` | `no` | The name of the deadline. <br />*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
-| type | `enum` | `yes` | `no` | The deadline type.<br>*Possibles values are: `start` and `completion`* |
-| until | `string` | `depends` | `no` | The **ISO 8601** date and time after which the deadline triggers the defined escalation.<br>*Is required if `duration` has not been set.* |
-| duration | `dateTime` | `depends` | `no` | The **ISO 8601** duration after which the deadline triggers the defined escalation.<br>*Is required if `until` has not been set.* |
-| escalations | [`escalationDefinition[]`](#escalation-definition) | `yes` | `no` | An array containing the escalations that may be performed when the deadline has been reached.<br>Must contain at least one escalation definition. |
-
 ### Escalation Definitions
 
 #### Description
 
 Represents the definition of an escalation that occurs if the human task has not reached a given status before a specific date and time, or before a given amount of time.
-
-#### Examples
-
-*Example of an escalation that reassigns the task to Alan if the the task's amount is higher than 10,000.00:*
-
-```yaml
-...
-- name: reassign-to-alan
-  condition: '${ .input.value > 10000 }'
-  action:
-    reassign:
-      to: 
-        user: alan
-...
-```
 
 #### Properties
 
@@ -295,6 +287,26 @@ Represents the definition of an escalation that occurs if the human task has not
 | name | `string` | `yes` | `no` | The name of the escalation. <br />*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
 | condition | `string` | `no` | `yes` | A [runtime expression](#runtime-expression) that determines whether or not the deadline applies.
 | action | `escalationActionDefinition` | `yes` | `no` | Configures the [`escalation action`](#escalation-action-definition) to perform |
+
+#### Examples
+
+*Example of an escalation that reassigns the task to Alan if the the task's amount is higher than 10,000.00:*
+
+```yaml
+...
+deadlines:
+  - name: start-before-30m
+    type: start
+    duration: PT30M
+    escalations:
+      - name: reassign-to-alan
+        condition: '${ .input.value > 10000 }'
+        action:
+          reassign:
+            to: 
+              user: alan
+...
+```
 
 ### Escalation Action Definitions
 
@@ -322,12 +334,6 @@ There are 3 different types of escalation actions:
 
 Sends a notification to a given list of recipients as the result of an elapsed deadline.
 
-#### Examples
-
-```yaml
-
-```
-
 #### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
@@ -336,17 +342,29 @@ Sends a notification to a given list of recipients as the result of an elapsed d
 | input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to override the [`notification`](#notification-definition)'s input data based on the human task's data.<br>If an `object`, represents the input data of the notification to produce. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
 | recipients  | [`peopleAssignmentDefinition`](#people-assignment-definition) | `no` | `no` | An object used to override the referenced [`notification definition`](#notification-definition)'s [`recipients`](#people-assignment-definition) 
 
+#### Examples
+
+```yaml
+deadlines:
+  - name: start-before-30m
+    type: start
+    duration: PT30M
+    escalations:
+      - name: notify-stakeholders
+        condition: '${ .input.value > 10000 }'
+        action:
+          notify:
+            refName: please-resolve-urgently
+            recipients: 
+              genericRole: stackholder
+```
+
+
 ### Reassignment Escalation Action Definitions
 
 #### Description
 
 Configures a reassignment to perform as the result of an elapsed deadline.
-
-#### Examples
-
-```yaml
-
-```
 
 #### Properties
 
@@ -354,17 +372,27 @@ Configures a reassignment to perform as the result of an elapsed deadline.
 |------|:----:|:--------:|:---------------------:|-------------|
 | to | `peopleSelectorDefinition` | `no` | `no` | Configures the people to reassign the task to.
 
+#### Examples
+
+```yaml
+deadlines:
+  - name: start-before-30m
+    type: start
+    duration: PT30M
+    escalations:
+      - name: reassign-to-alan
+        condition: '${ .input.value > 10000 }'
+        action:
+          reassign:
+            to: 
+              user: alan
+```
+
 ### SubTask Escalation Action Definitions
 
 #### Description
 
 Configures a subtask to create as the result of an elapsed deadline.
-
-#### Examples
-
-```yaml
-
-```
 
 #### Properties
 
@@ -372,4 +400,19 @@ Configures a subtask to create as the result of an elapsed deadline.
 |------|:----:|:--------:|:---------------------:|-------------|
 | refName | `string` | `yes` | `yes` | A literal or a [runtime expression](#runtime-expression) that references the [`subtask definition`](#subtask-definition) to create. |
 | input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to build the subtask's input data based on the human task's data.<br>If an `object`, represents the input data of the subtask to create. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
-| people  | [`peopleAssignmentDefinition`](#people-assignment-definition) | `no` | `no` | An object used to override the referenced [`subtask definition`](#subtask-definition)'s [`people assignment definitions`](#people-assignment-definition) |
+| assignments  | [`peopleAssignmentDefinition`](#people-assignment-definition) | `no` | `no` | An object used to override the referenced [`subtask definition`](#subtask-definition)'s [`assignments`](#people-assignment-definition) |
+
+#### Examples
+
+```yaml
+deadlines:
+  - name: start-before-30m
+    type: start
+    duration: PT30M
+    subtask:
+      - name: update-rates-offer
+        condition: '${ .input.value > 10000 }'
+        action:
+          subtask:
+            refName: update-rates-offer
+```
