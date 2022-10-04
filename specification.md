@@ -187,8 +187,8 @@ Represents the definition of a view.
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| type | `string` | true | true | The view type.<br>*Defaults to [`md`](https://www.markdownguide.org/).*<br>*Can be a [runtime expression](#runtime-expression).* |
-| template | `string`<br>`object` | true | true | The view template.<br>*If a `string`, the raw template contents.*<br>*If an `object`, the inline template.*<br>*Can be a (or contain) [runtime expression(s)](#runtime-expression).* |
+| type | `string` | `yes` | `yes` | The view type.<br>*Defaults to [`md`](https://www.markdownguide.org/).*<br>*Can be a [runtime expression](#runtime-expression).* |
+| template | `string`<br>`object` | `yes` | `yes` | The view template.<br>*If a `string`, the raw template contents.*<br>*If an `object`, the inline template.*<br>*Can be a (or contain) [runtime expression(s)](#runtime-expression).* |
 
 #### Examples
 
