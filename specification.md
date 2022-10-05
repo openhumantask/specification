@@ -1159,7 +1159,7 @@ Represents a processed [people assignments definition](#people-assignments-defin
 | [potentialOwners](#potential-owners) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [potential owners](#potential-owners) of the task. |
 | initiator | [`userReference`](#user-references) | `yes` | `no` | A [user reference](#user-references) that describes the task's initiator |
 | [excludedOwners](#excluded-owners) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [excluded owners](#excluded-owners) of the task. |
-| [potentialTaskInitiators](#potential-task-initiators) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [potential initiators](#potential-task-initiators) of the task. |
+| [potentialInitiators](#potential-task-initiators) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [potential initiators](#potential-task-initiators) of the task. |
 | actualOwner | [`userReference`](#user-references) | `no` | `no` | A [user reference](#user-references) that describes the actual owner of the task. |
 | [taskStakeholders](#stakeholders) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [stakeholders](#stakeholders) of the task. |
 | [businessAdministrators](#businessAdministrators) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [business administrators](#business-administrators) of the task. |
