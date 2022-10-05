@@ -12,12 +12,10 @@
       - [Stakeholders](#stakeholders)
       - [Business Administrators](#business-administrators)
     - [Lifecycle](#lifecycle)
-    - [Data](#data)
+    - [Task Instance Data](#task-instance-data)
       - [Operational Context](#operational-context)
-      - [Data Flow](#data-flow)
     - [Runtime expressions](#runtime-expressions)
-    - [Deadlines](#deadlines)
-    - [Escalations](#escalations)
+    - [Deadlines and Escalations](#deadlines-and-escalations)
     - [Notifications](#notifications)
   - [Implementation Guidelines](#implementation-guidelines)
     - [API](#api)
@@ -34,7 +32,7 @@
     - [Notification Definitions](#notification-definitions)
     - [Deadline Definitions](#deadline-definitions)
     - [Escalation Definitions](#escalation-definitions)
-    - [Escalation action Definitions](#escalation-action-definitions)
+    - [Escalation Action Definitions](#escalation-action-definitions)
       - [Notification](#notification-escalation-action-definitions)
       - [Reassignment](#reassignment-escalation-action-definitions)
       - [SubTask](#subtask-escalation-action-definitions)
@@ -192,47 +190,197 @@ graph TD;
     InProgress-->Completed
 ```
 
-### Data flow
+### Task Instance Data
 
-```mermaid
-graph TD;
+#### Input Data
 
-    START[ ]-->A[Input Data];
+##### Introduction
 
-    A--Input data filter-->B[Input Data];
+The business data passed as the task's input. 
 
-    B--Form input data filter-->C[Form Data];
+It may or may not be, partially or not, related to the data of the task's form submitted by users. Equally, it may or may not be, partially or not, related to the task's output data.
 
-    C--Form output data filter-->D[Output Data];
+The data is validated against the [JsonSchema](https://json-schema.org/) specified as the `inputDataSchema` property of the [task's definition](#human-task-definitions), if any.
 
-    D--Output data filter-->E[Output Data];
+Note that the input data should be presented in a human-readable way (avoid machine formats such as `json`) to users performing the task. 
 
-    E-->END[ ];
-    
-    style A fill:#325780,color:white;
-    style B fill:#325780,color:white;
-    style C fill:#60D2F7,color:black;
-    style D fill:#63E0DE,color:black;
-    style E fill:#63E0DE,color:black;
-    style START fill-opacity:0, stroke-opacity:0;
-    style END  fill-opacity:0, stroke-opacity:0; 
+##### Examples
+
+```yaml
+client:
+  id: 123
+  firstName: Larry
+  lastName: Queen
+  dateOfBirth: '03/22/1969'
+request:
+  concerns: debit-card
+  requestType: order
+  parameters:
+    originatesFrom:
+      type: agency
+      name: OpenBank Zimbabwe
+      address: 69 Love Street, 1969 Harare, Zimbabwe
+    deliverTo:
+      type: agency
+      name: OpenBank Zimbabwe
+      address: 69 Love Street, 1969 Harare, Zimbabwe
+    observations: none
+```
+
+#### Output Data
+
+##### Introduction
+
+The task's business data output.
+
+The data is validated against the [JsonSchema](https://json-schema.org/) specified as the `outputDataSchema` property of the [task's definition](#human-task-definitions), if any.
+
+##### Examples
+
+```yaml
+client:
+  id: 123
+  firstName: Larry
+  lastName: Queen
+  dateOfBirth: '03/22/1969'
+request:
+  createdAt: 02/02/2022, 14:55:51 +01:00
+  concerns: debit-card
+  requestType: order
+  parameters:
+    originatesFrom:
+      type: agency
+      name: OpenBank Zimbabwe
+      address: 69 Love Street, 00000 Harare, Zimbabwe
+    deliverTo:
+      type: agency
+      name: OpenBank Zimbabwe
+      address: 69 Love Street, 00000 Harare, Zimbabwe
+    observations: none
+result:
+  type: success
+  status: inProgress
+  scheduledDate: 02/07/2022
+```
+
+#### Form Data
+
+##### Introduction
+
+Represents the form data submitted by users.
+
+##### Examples
+
+#### Context Data
+
+##### Introduction
+
+The `$CONTEXT` [runtime expression](#runtime-expressions) argument exposes operational data, such as both the task's input and output data, its form, its comments, its attachments, etc.
+
+Note that exposed data is processed and arranged before making it available.
+
+##### Examples
+
+For example, if a [task's definition](#human-task-definitions) declares a subject such as the following:
+
+```yaml
+...
+subject:
+  en: 'OpenBank Memo - ${ $CONTEXT.inputData.department.name.en } Department'
+...
+```
+
+... and if it is instanciated with an input data such as the following:
+
+```yaml
+department:
+  id: 123
+  name:
+    en: 'Credits and Loans'
+```
+
+The following data would be made available in the `$CONTEXT` argument:
+
+```yaml
+...
+subject:
+  en: 'OpenBank Memo - Credits and Loans Department'
+...
+```
+
+##### Properties
+
+| Name | Type | Description | 
+|------|:----:|-------------|
+| id | `string` | The task instance's unique identifier. |
+| key | `string` | The task instance's key. |
+| definitionId | `string` | The unique identifier of the [task's definition](#human-task-definitions). |
+| status | `enum` | The task instance's [status](#task-statuses). |
+| priority | `number` | The task instance's priority. |
+| title | `object` | The mappings of localized titles to their two-letter **ISO 639-1** language names. |
+| subject | `object` | The mappings of localized subjects to their two-letter **ISO 639-1** language names. |
+| description | `object` | The mappings of localized descriptions to their two-letter **ISO 639-1** language names. |
+| peopleAssginments | [`peopleAssignments`](#people-assignments-definitions) | Describes the people related to the task and their assigned role(s). |
+| inputData | `object` | The task instance's input data. |
+| outputData | `object` | The task instance's output data. |
+| form | [`form`](#forms) | The task's form. |
+| comments | [`comment[]`](#comments) | An array containing the task's comments. |
+| attachments | [`attachment`](#attachments) | An array containg the task's attachments. |
+
+##### Examples
+
+*Example of a [jq](https://stedolan.github.io/jq/) condition that checks whether or not the task's instance's `priority` is higher than or equals 10:*
+
+```jq
+$CONTEXT.priority >= 10
 ```
 
 ### Runtime expressions
 
-*Coming soon...*
+The specification defines expressions that can be used to select, filter, alter and create task-related data based on the [operational context](#operational-context).
 
-### Deadlines
+Because of its countless features, we chose to use [`jq`](https://stedolan.github.io/jq/) as the spec's default runtime expression language, which by the way is a minimal requirement for implementations.
 
-*Coming soon...*
+### Deadlines and escalations
 
-### Escalations
+[Deadlines](#deadline-definitions) define a point in time at which a human task must have reached a specific status. If it did not, a set of [action](#escalation-action-definitions) are performed as part of conditonal [escalations](#escalation-definitions).
 
-*Coming soon...*
+There are two kind of [deadlines](#deadline-definitions):
+
+- `start`: Specifies the time until the task has to start, i.e. it has to reach state `inProgress`. It is defined as either the period of time or the point in time until the task has to reach state `inProgress`. 
+Since expressions are allowed, durations and deadlines can be calculated at runtime, which for example enables custom calendar integration. The time starts to be measured from the time at which the task enters the state `created`. If the task does not reach state `inProgress` by the deadline an [escalation action](#escalation-action-definitions) or a set of [escalation actions](#escalation-action-definitions) is performed. Once the task is started, the timer becomes obsolete.
+
+- `completion`: Specifies the due time of the task. It is defined as either the period of time until the task gets due or the point in time when the task gets due. The time starts to be measured from the time at which the task enters the state Created. If the task does not reach one of the final states (`completed`, `failed`, `error`, `exited`, `obsolete`) by the deadline an [escalation action](#escalation-action-definitions) or a set of [escalation actions](#escalation-action-definitions) is performed.
+
+When a [deadline](#deadline-definitions) is reached, its [escaltions](#escalation-definitions) are evaluated to determine whether or not they should be performed. If an [escalations](#escalation-definitions) matches, the [action](#escalation-action-definitions) it defines is performed.
+
+There are 3 types of [escalation actions](#escalation-action-definitions):
+
+- [`notification`](#notification-escalation-action-definitions): Creates a new instance of the specified [notification definition](#notification-definitions) and adds to the work item queue of the specified recipients.
+- [`reassignment`](#reassignment-escalation-action-definitions): Reassigns the task to another person and/or group of people.
+- [`subtask`](#subtask-escalation-action-definitions): Creates a new subtask as the result of the escalation.
+
+An example deadline use case would be to notify the actual owner that the task is past due after 1 hours if it has not been completed. Here is how to do this:
+
+```yaml
+...
+deadlines:
+  - name: start-before-1h
+    type: completion
+    duration: PT1H
+    escalations:
+      - name: reminder
+        action:
+          notification:
+            refName: please-resolve-urgently
+...
+```
 
 ### Notifications
 
-*Coming soon...*
+[Notifications](#notification-definitions) are used to communicate the progress of a task to one or more recipients. 
+
+Like [forms](#form-definitions), [notifications](#notification-definitions) define a [view](#view-definitions) that specifies how to render them.
 
 ## Implementations guidelines
 
