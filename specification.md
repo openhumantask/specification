@@ -12,9 +12,12 @@
       - [Stakeholders](#stakeholders)
       - [Business Administrators](#business-administrators)
     - [Lifecycle](#lifecycle)
-    - [Task Instance Data](#task-instance-data)
-      - [Operational Context](#operational-context)
     - [Runtime expressions](#runtime-expressions)
+    - [Task Instance Data](#task-instance-data)
+      - [Input Data](#input-data)
+      - [Form Data](#form-data)
+      - [Output Data](#output-data)
+      - [Runtime Context Data](#runtime-context-data)
     - [Deadlines and Escalations](#deadlines-and-escalations)
     - [Notifications](#notifications)
   - [Implementation Guidelines](#implementation-guidelines)
@@ -178,6 +181,28 @@ Defines the people who receive notifications about the user task's status.
 
 ### Lifecycle
 
+#### Instanciation
+
+Once created, a [human task definition](#human-task-definition) needs to be instanciated, which can be done in various ways:
+
+- `Periodically`, by defining a [schedule](#schedule-definition), in which case the [task](#human-task-definition) will be instanciated at configured intervals.
+- `Manually`, in which case the [task](#human-task-definition) is explicitly instanciated by a [potential initiator](#potential-initiators).
+- `Asynchronously`, in which case the [task](#human-task-definition) is instanciated by a consumed [`HumanTaskCreationRequested` integration event](#human-task-creation-requested-integration-event).
+- `Implicitly`, in which case the [task](#human-task-definition) is instanciated by another [task](#human-task-definition), for example as the result of an [escalation](#deadlines-and-escalations).  
+
+#### Task instance statuses
+
+| name | description |
+|------|-------------|
+| `created` | The [task](#human-tasks) has been created. <br>It should automatically move to the `ready` status, save if the [potential owners](#potential-owners) query did not resolve a single user.<br>In that case, a [business administrator](#business-administrator) of the task is expected to explicitly assign the [task](#human-tasks).|
+| `ready` | The [task](#human-tasks) can be claimed by one of its [potential owners](#potential-owners).  |
+| `reserved` | The [task](#human-tasks) is assigned to a single person or has been claimed by one of its [potential owners](#potential-owners).<br>The [actual owner](#actual-owner) of a [task](#human-tasks) can choose to release it and make it again available to its [potential owners](#potential-owners). |
+| `running` | The [task](#human-tasks) has started and is in progress. |
+| `completed` | The [task](#human-tasks) has been completed. |
+| `obsolete` | The [task](#human-tasks) is obsolete and has been skipped. |
+
+#### Flow
+
 ```mermaid
 graph TD;
     Created-->Ready;
@@ -190,7 +215,45 @@ graph TD;
     InProgress-->Completed
 ```
 
+### Runtime expressions
+
+#### Description
+
+The specification defines expressions that can be used to select, filter, alter and create task-related data based on the [operational context](#operational-context).
+
+By convention, <ins>all runtime expressions should be expressed using the `${ expression }` format</ins>, even as values of properties that explicitly expect a runtime expression. 
+This allows readers of an authored [definition](#human-task-definitions) to easily identify them.
+
+Because of its countless features, we chose to use [`jq`](https://stedolan.github.io/jq/) as the spec's default runtime expression language, which by the way is a minimal requirement for implementations.
+
+#### Examples
+
+*Example of a [`jq`](https://stedolan.github.io/jq/) expression used to interpolate a greeting message with the [actual owner](#actual-owner)'s name:*
+
+```yaml
+Hello ${ $CONTEXT.peopleAssignments.actualOwner.name }! How are you today?
+```
+
+*Example of a [`jq`](https://stedolan.github.io/jq/) expression used to merge the task's input data and the form's data:*
+
+```yaml
+$CONTEXT.inputData + $CONTEXT.form.data
+```
+
+*Example of a [`jq`](https://stedolan.github.io/jq/) condition used to check if an hypothetical customer passed as the task's input is an adult:*
+```yaml
+${ (((now | todate)[0:4] | tonumber) - ($CONTEXT.inputData.customer.dateOfBirth[0:4] | tonumber)) >= 18 }
+```
+
 ### Task Instance Data
+
+Task instances have access to 3 types of data:
+
+- [Input Data](#input-data): The task's input data.
+- [Form Data](#form-data): The task's form data, filled by owners.
+- [Output Data](#input-data): The task's output data.
+
+The data is exposed to [runtime expressions](#runtime-expressions) by the [runtime context](#runtime-context-data), using the `$CONTEXT` argument, which is described [here](#runtime-context-data).
 
 #### Input Data
 
@@ -225,6 +288,21 @@ request:
       name: OpenBank Zimbabwe
       address: 69 Love Street, 1969 Harare, Zimbabwe
     observations: none
+```
+
+#### Form Data
+
+##### Introduction
+
+Represents the form data submitted by task owners.
+
+##### Examples
+
+```yaml
+requestReviewed: true
+requestOutcome: accepted
+confidenceRatio: 0.92
+observations: None
 ```
 
 #### Output Data
@@ -263,50 +341,13 @@ result:
   scheduledDate: 02/07/2022
 ```
 
-#### Form Data
-
-##### Introduction
-
-Represents the form data submitted by users.
-
-##### Examples
-
-#### Context Data
+#### Runtime Context Data
 
 ##### Introduction
 
 The `$CONTEXT` [runtime expression](#runtime-expressions) argument exposes operational data, such as both the task's input and output data, its form, its comments, its attachments, etc.
 
 Note that exposed data is processed and arranged before making it available.
-
-##### Examples
-
-For example, if a [task's definition](#human-task-definitions) declares a subject such as the following:
-
-```yaml
-...
-subject:
-  en: 'OpenBank Memo - ${ $CONTEXT.inputData.department.name.en } Department'
-...
-```
-
-... and if it is instanciated with an input data such as the following:
-
-```yaml
-department:
-  id: 123
-  name:
-    en: 'Credits and Loans'
-```
-
-The following data would be made available in the `$CONTEXT` argument:
-
-```yaml
-...
-subject:
-  en: 'OpenBank Memo - Credits and Loans Department'
-...
-```
 
 ##### Properties
 
@@ -329,17 +370,38 @@ subject:
 
 ##### Examples
 
+*For example, if a [task's definition](#human-task-definitions) declares a subject such as the following:*
+
+```yaml
+...
+subject:
+  en: 'OpenBank Memo - ${ $CONTEXT.inputData.department.name.en } Department'
+...
+```
+
+*... and if it is instanciated with an input data such as the following:*
+
+```yaml
+department:
+  id: 123
+  name:
+    en: 'Credits and Loans'
+```
+
+*The following data would be made available in the `$CONTEXT` argument:*
+
+```yaml
+...
+subject:
+  en: 'OpenBank Memo - Credits and Loans Department'
+...
+```
+
 *Example of a [jq](https://stedolan.github.io/jq/) condition that checks whether or not the task's instance's `priority` is higher than or equals 10:*
 
 ```jq
 $CONTEXT.priority >= 10
 ```
-
-### Runtime expressions
-
-The specification defines expressions that can be used to select, filter, alter and create task-related data based on the [operational context](#operational-context).
-
-Because of its countless features, we chose to use [`jq`](https://stedolan.github.io/jq/) as the spec's default runtime expression language, which by the way is a minimal requirement for implementations.
 
 ### Deadlines and escalations
 
