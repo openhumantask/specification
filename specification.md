@@ -35,13 +35,13 @@
     - [Logical People Group Definitions](#logical-people-group-definitions)
     - [Form Definitions](#form-definitions)
     - [View Definitions](#view-definitions)
+    - [Subtask Definitions](#subtask-definitions)
     - [Notification Definitions](#notification-definitions)
+    - [Reassignment](#reassignment-definitions)
     - [Deadline Definitions](#deadline-definitions)
+    - [Completion Behavior Definitions](#completion-behavior-definitions)
     - [Escalation Definitions](#escalation-definitions)
     - [Escalation Action Definitions](#escalation-action-definitions)
-      - [Notification](#notification-escalation-action-definitions)
-      - [Reassignment](#reassignment-escalation-action-definitions)
-      - [SubTask](#subtask-escalation-action-definitions)
     - [Human Tasks](#human-tasks)
     - [People Assignments](#people-assignments)
     - [User References](#user-references)
@@ -476,17 +476,20 @@ Defines a human task and configures its behaviors.
 | namespace | `string` | `yes` | `no` | The namespace the human task definition belongs to. <br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` and `.` characters.* |
 | version | `string` | `yes` | `no` | The [semantic version](https://semver.org/) of the human task definition. |
 | specVersion | `string` | `yes` | `no` | The Human Task spec version to use. <br>*Defaults to the latest released spec version.* |
+| routingMode | `enum` | `yes` | `no` | The task's routing mode.<br>Possible values are: `none`, `sequential` and `parallel`.<br>If sets to `none`, the task's does not perform any routing.<br>If set to `sequential`, a new subtask will be created and assigned to the first resolved [potential owner](#potential-owners). The runtime waits for the subtask's completion, then assigns a new one to the next [potential owner](#potential-owners), and repeats those steps until all [potential owner](#potential-owners) have performed the task.<br>If set to `parallel`, a subtask is created for each and every [potential owner](#potential-owners). The resulting subtasks are performed by their [actual owner](#actual-owner) in parallel.<br>*Defaults to `none`.* |
 | expressionLanguage | `string` | `yes` | `no` | The language to use to evaluate [runtime expression](#runtime-expression)s.<br>*Defaults to [`jq`](https://stedolan.github.io/jq/).* |
 | key | `string` | `no` | `yes` | A literal or a [runtime expression](#runtime-expression) used to generate the keys of instanciated human tasks. It could be used, in the case of a purchase review, to set the reviewed purchase order's id as the human task's key   |
 | title | `object` | `no` | `yes` | The mappings of localized titles to their two-letter **ISO 639-1** language names. Titles are used as human task localized display name. |
 | subject | `object` | `no` | `yes` | The mappings of localized subjects to their two-letter **ISO 639-1** language names. |
 | description | `object` | `no` | `yes` | The mappings of localized descriptions to their two-letter **ISO 639-1** language names. |
-| peopleAssignments | [`peopleAssignmentsDefinition`](#people-assignments-definitions) | `yes` | `no` | The configuration of the task's people assignments to generic roles. |
+| peopleAssignments | [`peopleAssignmentsDefinition`](#people-assignments-definitions) | `no` | `no` | The configuration of the task's people assignments to generic roles. |
 | inputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate inputs of the human task definition's instances. | 
 | outputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate outputs of the human task definition's instances. | 
-| form | `string`<br>[`formDefinition`](#form-definitions) | `yes` | `no` | Configures the task's form.<br>*If a `string`, an uri referencing the external [form definition](#form-definition).*<br>*If an `object`, the inline configuration of the human task's [form definition](#form-definition).* |
-| notifications | [`notification[]`](#notification-definitions) | `no` | `no` | An array containing the human task's [`notifications`](#notification-definitions). |
+| form | `string`<br>[`formDefinition`](#form-definitions) | `no` | `no` | Configures the task's form.<br>*If a `string`, an uri referencing the external [form definition](#form-definition).*<br>*If an `object`, the inline configuration of the human task's [form definition](#form-definition).* |
+| subtasks | [`subTaskDefinition[]`](#subtask-definitions) | `no` | `no` | An array containing the task's children task. |
+| subtaskExecutionMode | `enum` | `depends` | `no` | Defines the way subtasks should be executed.<br>Possible values are: `sequential` and `parallel`.<br>If set to `sequential`, [subtasks](#subtask-definitions) are executed in lexical order.<br>If set to `parallel`, [subtasks](#subtask-definitions) are executed in parallel.<br>*Required if at least one [subtask](#subtask-definitions) has been defined.*<br>*Defaults to `sequential`.* |
 | deadlines | [`deadlineDefinition[]`](#deadline-definitions) | `no` | `no` | An array containing the [`deadlines`](#deadline-definitions) of the human task's instances. |
+| completionBehaviors | [`completionBehaviorDefinitio[]`](#completion-behavior-definitions) | `no` | `no` | An array that contains the task's [completion behaviors](#completion-behavior-definitions).<br>*Must contain exactly one conditionless [completion behavior](#completion-behavior-definitions).*
 | annotations | `array`<br>`object` | `no` | `no` | An array of string-based key/value pairs containing helpful terms used to describe the human task intended purpose, subject areas, or other important qualities.
 | metadata | `object` | `no` | `no` | An object used to provide additional unstructured information about the human task definition. May be used by implementations to define additional functionality. | 
 
@@ -855,6 +858,35 @@ Views can be rendered using different modes. Note that multiple modes can be com
 ...
 ```
 
+### Subtask Definitions
+
+#### Description
+
+Represents the object that defines a configures the sub tasks of a [human task](#human-tasks).
+
+#### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| name | `string` | `yes` | `no` | The subtask's name.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
+| taskRef | `string` | `yes` | `yes` | The globally unique identifier of the [task definition](#human-task-definitions) to instanciate |
+| input | `string`<br>`object` | `no` | `yes` | The data to pass as the [subtask](#human-tasks)'s input.<br>If a `string` , is a runtime expression used to build the subtask's input data based on the human task's data.<br>If an `object`, represents the input data of the subtask to create. runtime expressions can be used in any and all properties, at whichever depth.<br>If not set, no input data is supplied to the [subtask](#human-task-definitions). |
+| peopleAssignments | [peopleAssignments](#people-assignments-definitions) | `no` | `yes` | Configures the people to assign the [subtask](#human-task) to.<br>*Overrides the [assignments](#people-assignments-definitions) configured by the [subtask's definition](#human-task-definitions).* |
+
+#### Examples
+
+*Configures a subtask using the `openmoviedb.provide-movie-feedback:1.0.2` [definition](#human-task-definition), with the [input data](#input-data)'s `movieToRate` property value, and assigning it to Patrice Janssens.*
+```yaml
+name: collect-movie-feedback
+taskRef: openmoviedb.provide-movie-feedback:1.0.2
+input: ${ .inputData.movieToRate }
+peopleAssignments:
+  potentialOwners:
+    - user:
+        id: 69
+        name: Patrice Janssens
+```
+
 ### Notification Definitions
 
 #### Description
@@ -865,7 +897,7 @@ Represents the definition of a notification, which is use to communicate the sta
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| name | `string` | `yes` | `no` | The name used to reference the notification definition.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
+| name | `string` | `yes` | `no` | The notification's name.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
 | views | [`viewDefinition[]`](#view-definitions) | `yes` | `yes` | Configures the notification's views.<br>*Must contain at least one [`view definition`](#view-definitions).* |
 | input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to build the notification's input data based on the human task's data.<br>If an `object`, represents the input data of the notification to produce. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
 | recipients | [`peopleAssignmentDefinition[]`](#people-assignment-definition) | `yes` | `no` | An array that contains the notification's recipients.<br>*Must contain at least one [recipient](#people-assignment-definition).*
@@ -894,6 +926,28 @@ notifications:
     view:
       type: md
       template: 'You have been assigned [a task](${ .context.task.uri }) that has not yet been performed.<br>Please address it as soon as possible.'
+...
+```
+
+### Reassignment Definitions
+
+#### Description
+
+Configures a task reassignment.
+
+#### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| to | `peopleSelectorDefinition` | `no` | `no` | Configures the people to reassign the task to.
+
+#### Examples
+
+```yaml
+...
+reassign:
+  to: 
+    user: alan
 ...
 ```
 
@@ -975,104 +1029,37 @@ Represents the definition of the action undertaken as the result of an escalatio
 
 There are 3 different types of escalation actions:
 
-- [`notification`](#notification-escalation-action-definition): used to notify users about the status of the task.
-- [`reassignment`](#reassignment-escalation-action-definition): used to reassign a task.
-- [`subtask`](#subtask-escalation-action-definition): used to create a new subtask.
+- [`notification`](#notification-definition): used to notify users about the status of the task.
+- [`reassignment`](#reassignment-definition): used to reassign a task.
+- [`subtask`](#subtask-definition): used to create a new subtask.
 
 #### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| notification | [`notification`](#notification-effect-definition) | `depends` | `no` | Configures the [`notification`](#notification-effect-definition) to produce, in case `type` has been set to `notification`.<br>Required if `reassignment` and `subtask` have not been set, should otherwise be null. |
-| reassignment | [`reassignment`](#reassignment-effect-definition) | `depends` | `no` | Configures the [`reassignment`](#reassignment-effect-definition) to perform, in case `type` has been set to `reassignment`.<br>Required if `notification` and `subtask` have not been set, should otherwise be null. |
-| subTask | [`notification`](#notification-effect-definition) | `depends` | `no` | Configures the [`subTask`](#subtask-effect-definition) to create, in case `type` has been set to `subtask`.<br>Required if `notification` and `reassignment` have not been set, should otherwise be null. |
+| notification | [`notification`](#notification-definition) | `depends` | `no` | Configures the [`notification`](#notification-definition) to produce, in case `type` has been set to `notification`.<br>Required if `reassignment` and `subtask` have not been set, should otherwise be null. |
+| reassignment | [`reassignment`](#reassignment-definition) | `depends` | `no` | Configures the [`reassignment`](#reassignment-definition) to perform, in case `type` has been set to `reassignment`.<br>Required if `notification` and `subtask` have not been set, should otherwise be null. |
+| subTask | [`subtask`](#subtask-definition) | `depends` | `no` | Configures the [`subTask`](#subtask-definition) to create, in case `type` has been set to `subtask`.<br>Required if `notification` and `reassignment` have not been set, should otherwise be null. |
 
-### Notification Escalation Action Definitions
+### Completion Behavior Definitions
 
 #### Description
 
-Sends a notification to a given list of recipients as the result of an elapsed deadline.
+*Coming soon...*
 
 #### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| refName | `string` | `yes` | `no` | The name of the notification to produce |
-| input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to override the [`notification`](#notification-definition)'s input data based on the human task's data.<br>If an `object`, represents the input data of the notification to produce. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
-| recipients  | [`peopleAssignmentDefinition`](#people-assignment-definition) | `no` | `no` | An object used to override the referenced [`notification definition`](#notification-definition)'s [`recipients`](#people-assignment-definition) 
+
+*Coming soon...*
 
 #### Examples
 
-```yaml
-deadlines:
-  - name: start-before-30m
-    type: start
-    duration: PT30M
-    escalations:
-      - name: notify-stakeholders
-        condition: '${ .input.value > 10000 }'
-        action:
-          notify:
-            refName: please-resolve-urgently
-            recipients: 
-              genericRole: stackholder
-```
-
-### Reassignment Escalation Action Definitions
-
-#### Description
-
-Configures a reassignment to perform as the result of an elapsed deadline.
-
-#### Properties
-
-| Name | Type | Required | Runtime<br>Expression | Description |
-|------|:----:|:--------:|:---------------------:|-------------|
-| to | `peopleSelectorDefinition` | `no` | `no` | Configures the people to reassign the task to.
-
-#### Examples
+*Coming soon...*
 
 ```yaml
-deadlines:
-  - name: start-before-30m
-    type: start
-    duration: PT30M
-    escalations:
-      - name: reassign-to-alan
-        condition: '${ .input.value > 10000 }'
-        action:
-          reassign:
-            to: 
-              user: alan
-```
 
-### SubTask Escalation Action Definitions
-
-#### Description
-
-Configures a subtask to create as the result of an elapsed deadline.
-
-#### Properties
-
-| Name | Type | Required | Runtime<br>Expression | Description |
-|------|:----:|:--------:|:---------------------:|-------------|
-| refName | `string` | `yes` | `yes` | A literal or a [runtime expression](#runtime-expressions) that references the [`subtask definition`](#subtask-definitions) to create. |
-| input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expressions) used to build the subtask's input data based on the human task's data.<br>If an `object`, represents the input data of the subtask to create. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
-| peopleAssignments  | [`peopleAssignmentsDefinition`](#people-assignments-definitions) | `no` | `no` | An object used to override the referenced [`subtask definition`](#subtask-definition)'s [`assignments`](#people-assignment-definition) |
-
-#### Examples
-
-```yaml
-deadlines:
-  - name: start-before-30m
-    type: start
-    duration: PT30M
-    subtask:
-      - name: update-rates-offer
-        condition: '${ .input.value > 10000 }'
-        action:
-          subtask:
-            refName: update-rates-offer
 ```
 
 ### Human Tasks
