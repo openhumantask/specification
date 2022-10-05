@@ -1161,7 +1161,7 @@ Represents a processed [people assignments definition](#people-assignments-defin
 | [excludedOwners](#excluded-owners) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [excluded owners](#excluded-owners) of the task. |
 | [potentialInitiators](#potential-task-initiators) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [potential initiators](#potential-task-initiators) of the task. |
 | actualOwner | [`userReference`](#user-references) | `no` | `no` | A [user reference](#user-references) that describes the actual owner of the task. |
-| [taskStakeholders](#stakeholders) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [stakeholders](#stakeholders) of the task. |
+| [stakeholders](#stakeholders) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [stakeholders](#stakeholders) of the task. |
 | [businessAdministrators](#businessAdministrators) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [business administrators](#business-administrators) of the task. |
 | [notificationRecipents](#notification-recipents) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [recipients of all notifications](#notification-recipents) produced by the task. |
 | groups | [`logicalPeopleGroup[]`](#logical-people-groups) | `no` | `no` | An array containing the resolved [`logical people groups`](#logical-people-groups) defined for the task's scope. |
