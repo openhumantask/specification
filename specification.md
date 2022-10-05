@@ -48,45 +48,89 @@
 
 ## Introduction
 
-### Core concepts
+The present documents intends to describe the Human Task Specification.
 
-#### Generic Human Roles
+The specification is intended to be a modernization of the (awesome) [WS-HumanTask Specification](http://docs.oasis-open.org/bpel4people/ws-humantask-1.1-spec-cs-01.html).
 
-*Coming soon...*
+## Core concepts
 
-##### Potential initiators
+### Generic Human Roles
 
-###### Description
+Generic human roles define what a person or a group of people resulting from a people query can do with tasks and notifications. The following generic human roles are taken into account in this specification:
 
-Defines the potential initiators of the task. Implementations should allow users to instanciate the tasks they are the potential initiators of.
+- [Potential initiators](#potential-initiators)
+- [Initiator](#initiator)
+- [Stakeholders](#stakeholers)
+- [Potential owners](#potential-owners)
+- [Actual owner](#actual-owner)
+- [Excluded owners](#excluded-owners)
+- [Business administrators](#business-administrators)
+- [Notification recipients]()
 
-###### Permissions
+#### Potential initiators
+
+##### Description
+
+Defines the potential initiators of the task.
+
+***Remark(s)**: Implementations should allow users to instanciate the tasks they are the potential initiators of.*
+
+##### Permissions
 
 - [x] Instanciate task.
 - [x] Patch input data *(only before task has been claimed)*.
 - [x] Add attachment *(only before task has been claimed)*.
 - [x] Add comment *(only before task has been claimed)*.
 
-##### Potential owners
+#### Initiator
 
-###### Description
+##### Description
+
+Represents the person that has initiated (instanciated) the task.
+
+##### Permissions
+
+- [x] Patch input data *(only before task has been claimed)*.
+- [x] Change priority *(only before task has been claimed)*.
+- [x] Add attachment *(only before task has been claimed)*.
+- [x] Add comment *(only before task has been claimed)*.
+
+#### Stakeholders
+
+##### Description
+
+Defines the people ultimately responsible for the oversight and outcome of the task. A task stakeholder can influence the progress of a task, for example, by adding ad-hoc attachments, forwarding the task, or simply observing the state changes of the task.  It is also allowed to perform administrative actions on the task instance and associated notification(s), such as resolving missed deadlines.
+
+##### Permissions
+
+- [x] Add/remove attachment.
+- [x] Add comment.
+- [x] Receive notifications.
+- [x] Patch input/output data.
+- [x] Forward task.
+- [x] Revoke task.
+- [x] Change priority.
+
+#### Potential owners
+
+##### Description
 
 Defines the persons who receive the task so that they can claim and complete it. A potential owner becomes the actual owner of a task by explicitly claiming it. Before the task has been claimed, potential owners can influence the progress of the task, for example by changing the priority of the task, adding ad-hoc attachments or comments.
 
-###### Permissions
+##### Permissions
 
 - [x] Claim task.
 - [x] Change priority *(only before task has been claimed)*.
 - [x] Add attachment *(only before task has been claimed)*.
 - [x] Add comment *(only before task has been claimed)*.
 
-##### Actual owner
+#### Actual owner
 
-###### Description
+##### Description
 
 An actual owner of a task is the person actually performing the task. When task is performed, the actual owner can execute actions, such as revoking the claim, forwarding the task, suspending and resuming the task execution or changing the priority of the task.
 
-###### Permissions
+##### Permissions
 
 - [x] Revoke task.
 - [x] Skip task. 
@@ -97,39 +141,23 @@ An actual owner of a task is the person actually performing the task. When task 
 - [x] Add attachment.
 - [x] Add comment.
 
-##### Excluded owners
+#### Excluded owners
 
-###### Description
+##### Description
 
 Defines the users that are excluded from performing (and otherwise know/do anything about) the task.
 
-###### Permissions
+##### Permissions
 
 None.
 
-##### Stakeholders
+#### Business administrators
 
-###### Description
-
-Defines the people ultimately responsible for the oversight and outcome of the task. A task stakeholder can influence the progress of a task, for example, by adding ad-hoc attachments, forwarding the task, or simply observing the state changes of the task.  It is also allowed to perform administrative actions on the task instance and associated notification(s), such as resolving missed deadlines.
-
-###### Permissions
-
-- [x] Add/remove attachment.
-- [x] Add comment.
-- [x] Receive notifications.
-- [x] Patch input/output data.
-- [x] Forward task.
-- [x] Revoke task.
-- [x] Change priority.
-
-##### Business administrators
-
-###### Description
+##### Description
 
 Business administrators play the same role as task stakeholders but at task definition level. Therefore, business administrators can perform the exact same operations as task stakeholders. Business administrators can also observe the progress of notifications.
 
-###### Permissions
+##### Permissions
 
 - [x] Add/remove attachment.
 - [x] Add comment.
@@ -140,7 +168,17 @@ Business administrators play the same role as task stakeholders but at task defi
 - [x] Change priority.
 - [x] Edit task definition.
 
-#### Lifecycle
+#### Notification recipients
+
+##### Description
+
+Defines the people who receive notifications about the user task's status.
+
+##### Permissions
+
+- [x] Receive notifications.
+
+### Lifecycle
 
 ```mermaid
 graph TD;
@@ -154,7 +192,7 @@ graph TD;
     InProgress-->Completed
 ```
 
-#### Data flow
+### Data flow
 
 ```mermaid
 graph TD;
@@ -180,43 +218,43 @@ graph TD;
     style END  fill-opacity:0, stroke-opacity:0; 
 ```
 
-#### Runtime expressions
+### Runtime expressions
 
 *Coming soon...*
 
-#### Deadlines
+### Deadlines
 
 *Coming soon...*
 
-#### Escalations
+### Escalations
 
 *Coming soon...*
 
-#### Notifications
+### Notifications
 
 *Coming soon...*
 
-### Implementations guidelines
+## Implementations guidelines
 
 *Coming soon...*
 
-#### API
+### API
 
 *Coming soon...*
 
-#### Cloud Events
+### Cloud Events
 
 *Coming soon...*
 
-### Definitions
+## Definitions
 
-#### Human Task Definitions
+### Human Task Definitions
 
-##### Description
+#### Description
 
 Defines a human task and configures its behaviors.
 
-##### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -239,7 +277,7 @@ Defines a human task and configures its behaviors.
 | annotations | `array`<br>`object` | `no` | `no` | An array of string-based key/value pairs containing helpful terms used to describe the human task intended purpose, subject areas, or other important qualities.
 | metadata | `object` | `no` | `no` | An object used to provide additional unstructured information about the human task definition. May be used by implementations to define additional functionality. | 
 
-##### Examples
+#### Examples
 
 ```yaml
 id: openbank.loan-management.loan-approval-request:1.0.5
@@ -287,13 +325,14 @@ annotations:
 metadata:
   x-obms-css-lib: adminkit
 ```
-#### People Assignments Definitions
 
-###### Description
+### People Assignments Definitions
+
+#### Description
 
 Represents the definition used to configure people assignments for instance of the human task definition.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -304,7 +343,7 @@ Represents the definition used to configure people assignments for instance of t
 | [businessAdministrators](#businessAdministrators) | [`peopleReferenceDefinition[]`](#people-reference-definitions) | `no` | `no` | The [business administrators](#business-administrators) of the task. |
 | [notificationRecipents](#notification-recipents) | [`peopleReferenceDefinition[]`](#people-reference-definitions) | `no` | `no` | The [recipients of all notifications](#notification-recipents) produced by the task. |
 | groups | [`logicalPeopleGroupDefinition[]`](#logical-people-group-definitions) | `no` | `no` | An array containing the [`logical people groups`](#logical-people-group-definition) defined for the task's scope. |
-###### Examples
+#### Examples
 
 ```yaml
 ...
@@ -314,20 +353,20 @@ peopleAssignments:
 ...
 ```
 
-#### People Reference Definitions
+### People Reference Definitions
 
-###### Description
+#### Description
 
 Represents an object used to reference a user or a group of users based on given parameters.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | user | `string` | `depends` | `yes` | References the user with the specified id, as defined by the JWT `sub` claim.<br>*Required if `users` has not been set.* |
 | users | [`usersReferenceDefinition`](#users-reference-definitions) | `depends`| `no` | References multiple users that match the defined filters.<br>*Required if `user` has not been set.* |
 
-###### Examples
+#### Examples
 
 *Example of a definition referencing a single person by id:*
 
@@ -349,13 +388,13 @@ Represents an object used to reference a user or a group of users based on given
 ...
 ```
 
-#### Users Reference Definitions
+### Users Reference Definitions
 
-###### Description
+#### Description
 
 Represents an object used to reference multiple users based on given parameters.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -363,7 +402,7 @@ Represents an object used to reference multiple users based on given parameters.
 | inGroup | `string` | `depends` | `yes` | The logical group that defines the users to reference.<br>Required if `withClaims` and `inGenericRole` have not been set, otherwise ignored. |
 | [inGenericRole](#generic-task-roles) | `enum` | `depends` | `no` | The [generic role](#generic-task-roles) that defines the users to reference.<br>Required if `withClaims` and `inGroup` have not been set, otherwise ignored.<br>*Assignments of users to generic roles are delcared in the [human task definition's `peopleAssignments`](#human-task-definitions) property.*  |
 
-###### Examples
+#### Examples
 
 *Example of a definition referencing users that match the specified [claim filters](#claim-filter-definitions):*
 
@@ -395,20 +434,20 @@ Represents an object used to reference multiple users based on given parameters.
 ...
 ```
 
-#### Claim Filter Definitions
+### Claim Filter Definitions
 
-###### Description
+#### Description
 
 Defines a logical group of people which can be referenced in the task's scope.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | type | `string` | `depends` | `yes` | The type of the claim matching users must own.<br>*Required if `value` has not been set.*<br>*If used in conjunction with the `value` property, filters users that have a claim of the specified type, with the specified value.*<br>*Supports [runtime expressions](#runtime-expressions).<br>Supports [regular expressions](https://www.regular-expressions.info/).* |
 | value | `string` | `depends` | `yes` | Specifies a claim value matching users must own.<br>*Required if `type` has not been set.*<br>*If the `type` property has not been set, filters users that have a claim of any type containing the specified value.*<br>*Supports [runtime expressions](#runtime-expressions).<br>Supports [regular expressions](https://www.regular-expressions.info/).*
 
-###### Examples
+#### Examples
 
 *Example of a claim filter definition that matches users that own at least one claim of type `task:perform`:*
 ```yaml
@@ -439,20 +478,20 @@ Defines a logical group of people which can be referenced in the task's scope.
 ...
 ```
 
-#### Logical People Group Definitions
+### Logical People Group Definitions
 
-###### Description
+#### Description
 
 Defines a logical group of people which can be referenced in the task's scope.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | name | `string` | `yes` | `no` | The name used to referenced the group in the task's scope.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
 | members | [peopleReferenceDefinition[]](#people-reference-definitions) | `yes` | `no` | An array containing the [people references](#people-reference-definitions) used to define the users belonging to the group.<br>*Must contain at least one [people reference](#people-reference-definitions).*|
 
-###### Examples
+#### Examples
 
 ```yaml
 ...
@@ -464,20 +503,20 @@ peopleAssignments:
 ...
 ```
 
-#### Form Definitions
+### Form Definitions
 
-###### Description
+#### Description
 
 Represents the definition of an human task form, which is used to collect data from users.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | data | [`formDataDefinition`](#form-data-definitions) | `no` | `no` | Configures the form's data. |
 | views | [`viewDefinition[]`](#view-definitions) | `yes` | `no` | Configures the form's views.<br>*Must contain at least one [`view definition`](#view-definitions).* |
 
-###### Examples
+#### Examples
 
 *Example of a form with an inline view:*
 
@@ -531,9 +570,9 @@ form:
 ...
 ```
 
-#### View Definitions
+### View Definitions
 
-###### Description
+#### Description
 
 Represents the definition of a view.
 
@@ -543,7 +582,7 @@ Views can be rendered using different modes. Note that multiple modes can be com
 - `render`: The template should is pre-rendered by the server before being served to consumers.
 - `none`: The template is not processed nor rendered, and is given as such to consumers.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -551,7 +590,7 @@ Views can be rendered using different modes. Note that multiple modes can be com
 | renderingMode | `enum` | `yes` | `no` | Defaults to `process`. Indicates the way the view should be rendered.<br>Possible values are: `process`, `render` and `none`. |
 | template | `string`<br>`object` | `yes` | `yes` | The view template.<br>*If a `string`, the raw template contents.*<br>*If an `object`, the inline template.*<br>*Can be a (or contain) [runtime expression(s)](#runtime-expression).* |
 
-###### Examples
+#### Examples
 
 *Example of a view definition using a raw template (`string`):*
 
@@ -603,13 +642,13 @@ Views can be rendered using different modes. Note that multiple modes can be com
 ...
 ```
 
-#### Notification Definitions
+### Notification Definitions
 
-###### Description
+#### Description
 
 Represents the definition of a notification, which is use to communicate the status of the task to users.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -618,7 +657,7 @@ Represents the definition of a notification, which is use to communicate the sta
 | input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to build the notification's input data based on the human task's data.<br>If an `object`, represents the input data of the notification to produce. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
 | recipients | [`peopleAssignmentDefinition[]`](#people-assignment-definition) | `yes` | `no` | An array that contains the notification's recipients.<br>*Must contain at least one [recipient](#people-assignment-definition).*
 
-###### Examples
+#### Examples
 
 *An example of such a notification would be a reminder to execute a start, which can be defined as follows:*
 
@@ -645,13 +684,13 @@ notifications:
 ...
 ```
 
-#### Deadline Definitions
+### Deadline Definitions
 
-###### Description
+#### Description
 
 Represents the definition of a deadline to reach a given human task status milestone. 
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -661,7 +700,7 @@ Represents the definition of a deadline to reach a given human task status miles
 | duration | `dateTime` | `depends` | `no` | The **ISO 8601** duration after which the deadline triggers the defined escalation.<br>*Is required if `until` has not been set.* |
 | escalations | [`escalationDefinition[]`](#escalation-definition) | `yes` | `no` | An array containing the escalations that may be performed when the deadline has been reached.<br>Must contain at least one escalation definition. |
 
-###### Examples
+#### Examples
 
 *For example, one might want to send a reminder notification if an important task has not started before 30 minutes.*
 
@@ -681,13 +720,13 @@ deadlines:
 ...
 ```
 
-#### Escalation Definitions
+### Escalation Definitions
 
-###### Description
+#### Description
 
 Represents the definition of an escalation that occurs if the human task has not reached a given status before a specific date and time, or before a given amount of time.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -695,7 +734,7 @@ Represents the definition of an escalation that occurs if the human task has not
 | condition | `string` | `no` | `yes` | A [runtime expression](#runtime-expression) that determines whether or not the deadline applies.
 | action | `escalationActionDefinition` | `yes` | `no` | Configures the [`escalation action`](#escalation-action-definition) to perform |
 
-###### Examples
+#### Examples
 
 *Example of an escalation that reassigns the task to Alan if the the task's amount is higher than 10,000.00:*
 
@@ -715,9 +754,9 @@ deadlines:
 ...
 ```
 
-#### Escalation Action Definitions
+### Escalation Action Definitions
 
-###### Description
+#### Description
 
 Represents the definition of the action undertaken as the result of an escalation. 
 
@@ -727,7 +766,7 @@ There are 3 different types of escalation actions:
 - [`reassignment`](#reassignment-escalation-action-definition): used to reassign a task.
 - [`subtask`](#subtask-escalation-action-definition): used to create a new subtask.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -735,13 +774,13 @@ There are 3 different types of escalation actions:
 | reassignment | [`reassignment`](#reassignment-effect-definition) | `depends` | `no` | Configures the [`reassignment`](#reassignment-effect-definition) to perform, in case `type` has been set to `reassignment`.<br>Required if `notification` and `subtask` have not been set, should otherwise be null. |
 | subTask | [`notification`](#notification-effect-definition) | `depends` | `no` | Configures the [`subTask`](#subtask-effect-definition) to create, in case `type` has been set to `subtask`.<br>Required if `notification` and `reassignment` have not been set, should otherwise be null. |
 
-#### Notification Escalation Action Definitions
+### Notification Escalation Action Definitions
 
-###### Description
+#### Description
 
 Sends a notification to a given list of recipients as the result of an elapsed deadline.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -749,7 +788,7 @@ Sends a notification to a given list of recipients as the result of an elapsed d
 | input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to override the [`notification`](#notification-definition)'s input data based on the human task's data.<br>If an `object`, represents the input data of the notification to produce. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
 | recipients  | [`peopleAssignmentDefinition`](#people-assignment-definition) | `no` | `no` | An object used to override the referenced [`notification definition`](#notification-definition)'s [`recipients`](#people-assignment-definition) 
 
-###### Examples
+#### Examples
 
 ```yaml
 deadlines:
@@ -766,20 +805,19 @@ deadlines:
               genericRole: stackholder
 ```
 
+### Reassignment Escalation Action Definitions
 
-#### Reassignment Escalation Action Definitions
-
-###### Description
+#### Description
 
 Configures a reassignment to perform as the result of an elapsed deadline.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | to | `peopleSelectorDefinition` | `no` | `no` | Configures the people to reassign the task to.
 
-###### Examples
+#### Examples
 
 ```yaml
 deadlines:
@@ -795,13 +833,13 @@ deadlines:
               user: alan
 ```
 
-#### SubTask Escalation Action Definitions
+### SubTask Escalation Action Definitions
 
-###### Description
+#### Description
 
 Configures a subtask to create as the result of an elapsed deadline.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -809,7 +847,7 @@ Configures a subtask to create as the result of an elapsed deadline.
 | input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expressions) used to build the subtask's input data based on the human task's data.<br>If an `object`, represents the input data of the subtask to create. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
 | peopleAssignments  | [`peopleAssignmentsDefinition`](#people-assignments-definitions) | `no` | `no` | An object used to override the referenced [`subtask definition`](#subtask-definition)'s [`assignments`](#people-assignment-definition) |
 
-###### Examples
+#### Examples
 
 ```yaml
 deadlines:
@@ -824,13 +862,13 @@ deadlines:
             refName: update-rates-offer
 ```
 
-#### Human Tasks
+### Human Tasks
 
-###### Description
+#### Description
 
 Represents an instance of a [human task definition](#human-task-definitions).
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -845,7 +883,7 @@ Represents an instance of a [human task definition](#human-task-definitions).
 | attachments | [`attachment[]`](#attachments) | `no` | `no` | The task's attachments. |
 | comments | [`comment[]`](#comments) | `no` | `no` | The task's comments. |
 
-###### Examples
+#### Examples
 
 ```yaml
 id: 'openbank.loan-management.loan-approval-request:1.0.5-1236547890'
@@ -908,13 +946,13 @@ comments:
       The client has a spotless record, and due diligence demonstrates that she has solid assets, and a substancial reserve of cash.
 ```
 
-#### People Assignments
+### People Assignments
 
-###### Description
+#### Description
 
 Represents a processed [people assignments definition](#people-assignments-definitions) containing the resolved users and their assignations.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -926,7 +964,7 @@ Represents a processed [people assignments definition](#people-assignments-defin
 | [notificationRecipents](#notification-recipents) | [`userReference[]`](#user-references) | `no` | `no` | The resolved [recipients of all notifications](#notification-recipents) produced by the task. |
 | groups | [`logicalPeopleGroup[]`](#logical-people-groups) | `no` | `no` | An array containing the resolved [`logical people groups`](#logical-people-groups) defined for the task's scope. |
 
-###### Examples
+#### Examples
 
 ```yaml
 ...
@@ -941,20 +979,20 @@ stakeholders:
 ...
 ```
 
-#### User References
+### User References
 
-###### Description
+#### Description
 
 Represents a reference to an user.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | id | `string` | `yes` | `no` | The user's unique identifier, as specified by its `sub` JWT claim type. |
 | name | `string` | `no` | `no` | The user's name, as specified by its `preferred_username` JWT claim type. |
 
-###### Examples
+#### Examples
 
 ```yaml
 ...
@@ -963,20 +1001,20 @@ name: John Smith
 ...
 ```
 
-#### Logical People Groups
+### Logical People Groups
 
-###### Description
+#### Description
 
 Represents a reference to a logical people group.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | name | `string` | `yes` | `no` | The name of the resolved logical user group.<br>*MUST be lowercase and must only contain alphanumeric characters, with the exception of the `-` character. |
 | members | [`userReference[]`](#user-references) | `yes` | `no` | An array containing the resolved members of the group. |
 
-###### Examples
+#### Examples
 
 ```yaml
 ...
@@ -989,20 +1027,20 @@ members:
 ...
 ```
 
-#### Forms
+### Forms
 
-###### Description
+#### Description
 
 Represents the instances of a [form definition](#form-definitions).
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | data | `object` | `no` | `no` | The task form's data. |
 | views | [`view[]`](#views) | `yes` | `no` | All available views defined for the task's form.<br>*Must contain at least one [view](#views).*
 
-###### Examples
+#### Examples
 
 ```yaml
 form:
@@ -1014,9 +1052,9 @@ form:
       template: ...
 ```
 
-#### Views
+### Views
 
-###### Description
+#### Description
 
 Represents a [form](#forms)'s view. 
 
@@ -1028,7 +1066,7 @@ The view might have been processed and rendered before getting served, as indica
 
 The `status` of a consumed view is defined by its [definition](#view-definitions)'s `renderingMode` property.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -1036,7 +1074,7 @@ The `status` of a consumed view is defined by its [definition](#view-definitions
 | status | `enum` | `yes` | `no` | Indicates the view's status.<br>Possible values are: `processed`, `rendered` and `template`. |
 | template | `string` | `yes` | `no` | The view template, possibly processed and/or rendered, depending on the specified `renderingMode`* |
 
-###### Examples
+#### Examples
 
 ```yaml
 form:
@@ -1068,13 +1106,13 @@ form:
       }
 ```
 
-#### Attachments
+### Attachments
 
-###### Description
+#### Description
 
 Represents an human task's attachment, which is used to associate external files (such as an image, a pdf file, etc.) to the task.
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -1086,7 +1124,7 @@ Represents an human task's attachment, which is used to associate external files
 | base64Content | `string` | `depends` | `no` | The [base64](https://en.wikipedia.org/wiki/Base64)-encoded content of the resource.<br>*Required if the `uri` property has not been set, otherwise ignored.*<br>*The use of inline resource if **strongly** discouradged, and one should instead use references to hosted resources (using the `uri` property).*|
 | author | [`userReference`](#user-references) | `yes` | `no` | A [user reference](#user-references) used to describe the attachment's author. |
 
-###### Examples
+#### Examples
 
 *Example of a PDF attachment:*
 
@@ -1104,13 +1142,13 @@ attachments:
 ...
 ```
 
-#### Comments
+### Comments
 
-###### Description
+#### Description
 
 Represents a comment written in the context of a given business process (human task).
 
-###### Properties
+#### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
@@ -1121,7 +1159,7 @@ Represents a comment written in the context of a given business process (human t
 | lastModifiedBy | [`userReference`](#user-references) | `yes` | `no` |  A [user reference](#user-references) used to describe the user that has last modified the comment. |
 | content | `string` | `yes` | `no` | The comment's content.*Supports [GitHub Flavored Markdown (GFM)](https://github.github.com/gfm/).* |
 
-###### Examples
+#### Examples
 
 *Example of a comment created by De'Andre and afterwards modified by Bing-Liu:*
 
