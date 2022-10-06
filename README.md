@@ -1,10 +1,11 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-green.svg?style=flat)](https://github.com/openhumantask/specification/issues)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/openhumantask/specification/blob/master/LICENSE)
 [<img src="http://img.shields.io/badge/slack-@openhumantask-red?style=social&logo=slack">](https://cloud-native.slack.com/messages/serverless-workflow) 
-# Human Task Specification
 
 <p align="center">
-  <img src="assets/images/oht-logo.png" height="350px" alt="Synapse Logo"/>
+  <img src="assets/images/oht-logo.png" height="350px" alt="Open Human Task Logo"/>
+  <br>
+  <img src="assets/images/oht-type.png" height="175" alt="Open Human Task Logotyping"/>
 </p>
 
 ## About
