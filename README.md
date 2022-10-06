@@ -1,6 +1,6 @@
 # Human Task Specification
 
-A modernized version of the [WS-Human Task Specification](http://docs.oasis-open.org/bpel4people/ws-humantask-1.1-spec-cs-01.html).
+A modernized of the [WS-Human Task Specification](http://docs.oasis-open.org/bpel4people/ws-humantask-1.1-spec-cs-01.html).
 
 ## Table of Contents
 
