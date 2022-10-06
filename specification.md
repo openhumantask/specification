@@ -489,8 +489,8 @@ Defines a human task and configures its behaviors.
 | subtasks | [`subTaskDefinition[]`](#subtask-definitions) | `no` | `no` | An array containing the task's children task. |
 | subtaskExecutionMode | `enum` | `depends` | `no` | Defines the way subtasks should be executed.<br>Possible values are: `sequential` and `parallel`.<br>If set to `sequential`, [subtasks](#subtask-definitions) are executed in lexical order.<br>If set to `parallel`, [subtasks](#subtask-definitions) are executed in parallel.<br>*Required if at least one [subtask](#subtask-definitions) has been defined.*<br>*Defaults to `sequential`.* |
 | deadlines | [`deadlineDefinition[]`](#deadline-definitions) | `no` | `no` | An array containing the [`deadlines`](#deadline-definitions) of the human task's instances. |
-| completionBehaviors | [`completionBehaviorDefinitio[]`](#completion-behavior-definitions) | `no` | `no` | An array that contains the task's [completion behaviors](#completion-behavior-definitions).<br>*Must contain exactly one conditionless [completion behavior](#completion-behavior-definitions).*
-| annotations | `array`<br>`object` | `no` | `no` | An array of string-based key/value pairs containing helpful terms used to describe the human task intended purpose, subject areas, or other important qualities.
+| completionBehaviors | [`completionBehaviorDefinition[]`](#completion-behavior-definitions) | `no` | `no` | An array that contains the task's [completion behaviors](#completion-behavior-definitions).<br>*Required if `routingMode` has not been set to `none`, or if the task defines `subtasks`. Otherwise optional.*
+| annotations | `array`<br>`object` | `depends` | `no` | An array of string-based key/value pairs containing helpful terms used to describe the human task intended purpose, subject areas, or other important qualities.
 | metadata | `object` | `no` | `no` | An object used to provide additional unstructured information about the human task definition. May be used by implementations to define additional functionality. | 
 
 #### Examples
@@ -1045,21 +1045,41 @@ There are 3 different types of escalation actions:
 
 #### Description
 
-*Coming soon...*
+Defines the completion behavior of a task by configuring how to build the task's output based on specified conditions.
+
+Completion behavior may or may not define a `condition` [runtime expression](#runtime-expressions) used to determine whether or not the completion behavior applies.
+
+If no `condition` is defined, the [completion-behavior](#completion-behavior-definitions) is considered the task's default. There can be at most one default [completion-behavior](#completion-behavior-definitions) defined per task.
 
 #### Properties
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-
-*Coming soon...*
+| name | `string` | `yes` | `no` | The name of the completion behavior. <br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
+| type | `enum` | `yes` | `no` | The completion behavior's type.<br>Possibles values are `automatic` and `manual`.<br>*If set to `automatic`, the task completes a soon as the `condition` matches.*<br>*If set the `manual`, the task must be explicitly completed by the actual owner whern the condition matches.*<br>*Defaults to `automatic`.* |
+| condition | `string` | `no` | `yes` | A [runtime expression](#runtime-expressions) used to determine whether or not the completion behavior applies.<br>If null or whitespace, the completion behavior is considered the task's default. There must be at most one default [completion behavior](#completion-behavior-definitions). |
+| output | `string`<br>`object` | `no` | `yes` | A `string` or `object` used to determine the task's output.<br>If a `string` , is a [runtime expression](#runtime-expressions) used to build the task's output data based on the human task's data.<br>If an `object`, represents the task's output data. [Runtime expression](#runtime-expressions) can be used in any and all properties, at whichever depth.<br>If not set, no input data is supplied to the [subtask](#human-task-definitions). |
 
 #### Examples
 
-*Coming soon...*
-
+*Example of a default and a conditional completion behaviors that set different task outputs:*
 ```yaml
-
+completionBehaviors:
+  - name: rated-behavior
+    type: automatic
+    condition: '${ $CONTEXT.form.data.rated }'
+    output:
+      movie: '${ $CONTEXT.inputData.movie }'
+      feedback:
+        seen: true
+        rating: '${ $CONTEXT.form.data.rating }'
+  - name: not-rated-behavior
+    type: automatic
+    output:
+      movie: '${ $CONTEXT.inputData.movie }'
+      feedback: 
+        seen: '${ $CONTEXT.form.data.hasSeenMovie }' 
+        comment: '${ $CONTEXT.form.data.comment }'
 ```
 
 ### Human Tasks
