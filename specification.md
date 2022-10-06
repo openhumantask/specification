@@ -34,6 +34,7 @@
     - [Claim Filter Definitions](#claim-filter-definitions)
     - [Logical People Group Definitions](#logical-people-group-definitions)
     - [Form Definitions](#form-definitions)
+    - [Data Model Definitions](#data-model-definitions)
     - [View Definitions](#view-definitions)
     - [Subtask Definitions](#subtask-definitions)
     - [Notification Definitions](#notification-definitions)
@@ -481,8 +482,8 @@ Defines a human task and configures its behaviors.
 | subject | `object` | `no` | `yes` | The mappings of localized subjects to their two-letter **ISO 639-1** language names. |
 | description | `object` | `no` | `yes` | The mappings of localized descriptions to their two-letter **ISO 639-1** language names. |
 | peopleAssignments | [`peopleAssignmentsDefinition`](#people-assignments-definitions) | `no` | `no` | The configuration of the task's people assignments to generic roles. |
-| inputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate inputs of the human task definition's instances. | 
-| outputDataSchema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | A [`JSON Schema`](https://json-schema.org/) use to define and validate outputs of the human task definition's instances. | 
+| inputData | [`dataModelDefinition`](#data-model-definitions) | `no` | `no` | A [`data model definition`](#data-model-definitions) use to define, validate and initialize the input of the human task definition's instances. | 
+| outputData | [`dataModelDefinition`](#data-model-definitions) | `no` | `no` | A [`data model definition`](#data-model-definitions) use to define, validate and initialize the output of the human task definition's instances. | 
 | form | `string`<br>[`formDefinition`](#form-definitions) | `no` | `no` | Configures the task's form.<br>*If a `string`, an uri referencing the external [form definition](#form-definition).*<br>*If an `object`, the inline configuration of the human task's [form definition](#form-definition).* |
 | subtasks | [`subTaskDefinition[]`](#subtask-definitions) | `no` | `no` | An array containing the task's children task. |
 | subtaskExecutionMode | `enum` | `depends` | `no` | Defines the way subtasks should be executed.<br>Possible values are: `sequential` and `parallel`.<br>If set to `sequential`, [subtasks](#subtask-definitions) are executed in lexical order.<br>If set to `parallel`, [subtasks](#subtask-definitions) are executed in parallel.<br>*Required if at least one [subtask](#subtask-definitions) has been defined.*<br>*Defaults to `sequential`.* |
@@ -510,8 +511,10 @@ subject:
 description:
   fr: Examiner une requête de crédit à tempérament
   en: Review an installment credit request 
-inputDataSchema: https://foo-bank.com/schemas/humantasks/input.json
-outputDataSchema: https://foo-bank.com/schemas/humantasks/output.json
+inputData:
+  schema: https://foo-bank.com/schemas/humantasks/input.json
+outputData:
+  schema: https://foo-bank.com/schemas/humantasks/output.json
 form:
   data:
     schema: https://foo-bank.com/schemas/humantasks/form.data.json
@@ -727,7 +730,7 @@ Represents the definition of an human task form, which is used to collect data f
 
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
-| data | [`formDataDefinition`](#form-data-definitions) | `no` | `no` | Configures the form's data. |
+| data | [`dataModelDefinition`](#data-model-definitions) | `no` | `no` | Configures the form's data. |
 | views | [`viewDefinition[]`](#view-definitions) | `yes` | `no` | Configures the form's views.<br>*Must contain at least one [`view definition`](#view-definitions).* |
 
 #### Examples
@@ -738,8 +741,7 @@ Represents the definition of an human task form, which is used to collect data f
 ...
 form:
   data:
-    filter:
-      input: '${ .input.client }'
+    state: '${ .input.client }'
     schema: 
       type: object
       properties:
@@ -782,6 +784,43 @@ form:
         }]
       }
 ...
+```
+
+### Data Model Definitions
+
+#### Description
+
+Defines, describes and validates a data model.
+
+#### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| schema | [`jsonSchema`](https://json-schema.org/) | `no` | `no` | The [`JsonSchema`](https://json-schema.org/) used to validate the model's data. |
+| state | `string`<br>`object` | `no` | `no` | The model's initial state.<br>If a `string` , is a runtime expression used to build the model's initial state based on the human task's data.<br>If an `object`, represents the initial state of the model to create.  [Runtime expressions](#runtime-expressions) can be used in any and all properties, at whichever depth.<br>If not set, the initial state is empty. |
+
+#### Examples
+
+```yaml
+data:
+  state: '${ .input.client }'
+  schema: 
+    type: object
+    properties:
+      client:
+        type: object
+        properties:
+          firstName:
+            type: string
+          lastName:
+            type: string
+          email:
+            type: string
+            format: email
+        required:
+          - firstName
+          - lastName
+          - email
 ```
 
 ### View Definitions
