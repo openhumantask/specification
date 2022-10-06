@@ -1002,8 +1002,8 @@ Represents the definition of a deadline to reach a given human task status miles
 |------|:----:|:--------:|:---------------------:|-------------|
 | name | `string` | `yes` | `no` | The name of the deadline. <br />*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
 | type | `enum` | `yes` | `no` | The deadline type.<br>*Possibles values are: `start` and `completion`* |
-| until | `string` | `depends` | `no` | The **ISO 8601** date and time after which the deadline triggers the defined escalation.<br>*Is required if `duration` has not been set.* |
-| duration | `dateTime` | `depends` | `no` | The **ISO 8601** duration after which the deadline triggers the defined escalation.<br>*Is required if `until` has not been set.* |
+| elapsesAt | `dateTimeOffset` | `depends` | `no` | The **ISO 8601** date and time at which the deadline elaspes and potentially triggers escalations.<br>*Required if `duration` has not been set.* |
+| elapsesAfter | `string` | `depends` | `no` | The **ISO 8601** duration after which the deadline elapses and potentially triggers escalations.<br>*Required if `until` has not been set.* |
 | escalations | [`escalationDefinition[]`](#escalation-definition) | `yes` | `no` | An array containing the escalations that may be performed when the deadline has been reached.<br>Must contain at least one escalation definition. |
 
 #### Examples
