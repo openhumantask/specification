@@ -1,6 +1,5 @@
 # Human Task Specification
 
-<<<<<<< HEAD
 ## About
 
 The Open Human Task (OHT) declares a vendor-neutral, open-source, free and community-driven specification for defining, running and managing Domain Specific Language (DSL) based human interactions with modern software ecosystems. 
@@ -12,9 +11,6 @@ The project is composed of:
 - [Specification]() to define and document the OHT DSL.
 - [Software Development Kits (SDKs)]() to read, write, parse and validate `Human Task Definitions` in multiple languages.
 - [Runtimes](): to manage, serve, render and execute `Human Task Definitions`.
-=======
-A modernization of the (awesome) [WS-Human Task Specification](http://docs.oasis-open.org/bpel4people/ws-humantask-1.1-spec-cs-01.html).
->>>>>>> 8443c6c3d52f8e09ce27c80efb15901a4102d825
 
 ## Table of Contents
 
