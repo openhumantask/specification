@@ -46,6 +46,7 @@
     - [Human Tasks](#human-tasks)
     - [People Assignments](#people-assignments)
     - [User References](#user-references)
+    - [Task Definition References](#task-definition-references)
     - [Forms](#forms)
     - [Views](#views)
     - [Attachments](#attachments)
@@ -618,7 +619,7 @@ Represents an object used to reference multiple users based on given parameters.
 |------|:----:|:--------:|:---------------------:|-------------|
 | withClaims | [`claimFilterDefinition[]`](#claim-filter-definitions) | `depends` | `no` | The claims to filter by the users to reference.<br>Required if `inGroup` and `inGenericRole` have not been set, otherwise ignored. |
 | inGroup | `string` | `depends` | `yes` | The logical group that defines the users to reference.<br>Required if `withClaims` and `inGenericRole` have not been set, otherwise ignored. |
-| [inGenericRole](#generic-task-roles) | `enum` | `depends` | `no` | The [generic role](#generic-task-roles) that defines the users to reference.<br>Required if `withClaims` and `inGroup` have not been set, otherwise ignored.<br>*Assignments of users to generic roles are delcared in the [human task definition's `peopleAssignments`](#human-task-definitions) property.*  |
+| [inGenericRole](#generic-human-roles) | `enum` | `depends` | `no` | The [generic role](#generic-human-roles) that defines the users to reference.<br>Required if `withClaims` and `inGroup` have not been set, otherwise ignored.<br>*Assignments of users to generic roles are delcared in the [human task definition's `peopleAssignments`](#human-task-definitions) property.*  |
 
 #### Examples
 
