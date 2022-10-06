@@ -10,9 +10,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{86DCD6E3-5
 		specification.md = specification.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{01687EE8-C1BD-40CF-BB97-A88D845ED537}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{B4A48B7D-ECE5-475C-93E4-9A048B0CD081}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Users\charl\Downloads\oht-logo.png = ..\..\..\Users\charl\Downloads\oht-logo.png
+		..\..\..\Users\charl\Downloads\oht-type.png = ..\..\..\Users\charl\Downloads\oht-type.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B4A48B7D-ECE5-475C-93E4-9A048B0CD081} = {01687EE8-C1BD-40CF-BB97-A88D845ED537}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {015637C2-BB41-4C55-B367-89015B9D3FEB}
