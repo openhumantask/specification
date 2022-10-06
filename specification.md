@@ -41,6 +41,7 @@
     - [Reassignment](#reassignment-definitions)
     - [Deadline Definitions](#deadline-definitions)
     - [Completion Behavior Definitions](#completion-behavior-definitions)
+    - [Outcome Definitions](#outcome-definitions)
     - [Escalation Definitions](#escalation-definitions)
     - [Escalation Action Definitions](#escalation-action-definitions)
     - [Human Tasks](#human-tasks)
@@ -479,9 +480,9 @@ Defines a human task and configures its behaviors.
 | routingMode | `enum` | `yes` | `no` | The task's routing mode.<br>Possible values are: `none`, `sequential` and `parallel`.<br>If sets to `none`, the task's does not perform any routing.<br>If set to `sequential`, a new subtask will be created and assigned to the first resolved [potential owner](#potential-owners). The runtime waits for the subtask's completion, then assigns a new one to the next [potential owner](#potential-owners), and repeats those steps until all [potential owner](#potential-owners) have performed the task.<br>If set to `parallel`, a subtask is created for each and every [potential owner](#potential-owners). The resulting subtasks are performed by their [actual owner](#actual-owner) in parallel.<br>*Defaults to `none`.* |
 | expressionLanguage | `string` | `yes` | `no` | The language to use to evaluate [runtime expression](#runtime-expression)s.<br>*Defaults to [`jq`](https://stedolan.github.io/jq/).* |
 | key | `string` | `no` | `yes` | A literal or a [runtime expression](#runtime-expression) used to generate the keys of instanciated human tasks. It could be used, in the case of a purchase review, to set the reviewed purchase order's id as the human task's key   |
-| title | `object` | `no` | `yes` | The mappings of localized titles to their two-letter **ISO 639-1** language names. Titles are used as human task localized display name. |
-| subject | `object` | `no` | `yes` | The mappings of localized subjects to their two-letter **ISO 639-1** language names. |
-| description | `object` | `no` | `yes` | The mappings of localized descriptions to their two-letter **ISO 639-1** language names. |
+| title | `string`<br>`object` | `no` | `yes` | The task's localized titles. Titles are used as human task localized display name.<br>If a `string`, the culture-invariant title's value.<br>If an `object`, the mappings of localized titles to their two-letter ISO 639-1 language names.<br>*Supports [runtime expression](#runtime-expressions).* |
+| subject | `string`<br>`object` | `no` | `yes` | The task's localized subjects.<br>If a `string`, the culture-invariant subject's value.<br>If an `object`, the mappings of localized subjects to their two-letter ISO 639-1 language names.<br>*Supports [runtime expression](#runtime-expressions).* |
+| description | `string`<br>`object` | `no` | `yes` | The task's localized descriptions.<br>If a `string`, the culture-invariant description's value.<br>If an `object`, the mappings of localized descriptions to their two-letter ISO 639-1 language names.<br>*Supports [runtime expression](#runtime-expressions).* |
 | peopleAssignments | [`peopleAssignmentsDefinition`](#people-assignments-definitions) | `no` | `no` | The configuration of the task's people assignments to generic roles. |
 | inputData | [`dataModelDefinition`](#data-model-definitions) | `no` | `no` | A [`data model definition`](#data-model-definitions) use to define, validate and initialize the input of the human task definition's instances. | 
 | outputData | [`dataModelDefinition`](#data-model-definitions) | `no` | `no` | A [`data model definition`](#data-model-definitions) use to define, validate and initialize the output of the human task definition's instances. | 
@@ -489,9 +490,12 @@ Defines a human task and configures its behaviors.
 | subtasks | [`subTaskDefinition[]`](#subtask-definitions) | `no` | `no` | An array containing the task's children task. |
 | subtaskExecutionMode | `enum` | `depends` | `no` | Defines the way subtasks should be executed.<br>Possible values are: `sequential` and `parallel`.<br>If set to `sequential`, [subtasks](#subtask-definitions) are executed in lexical order.<br>If set to `parallel`, [subtasks](#subtask-definitions) are executed in parallel.<br>*Required if at least one [subtask](#subtask-definitions) has been defined.*<br>*Defaults to `sequential`.* |
 | deadlines | [`deadlineDefinition[]`](#deadline-definitions) | `no` | `no` | An array containing the [`deadlines`](#deadline-definitions) of the human task's instances. |
-| completionBehaviors | [`completionBehaviorDefinition[]`](#completion-behavior-definitions) | `no` | `no` | An array that contains the task's [completion behaviors](#completion-behavior-definitions).<br>*Required if `routingMode` has not been set to `none`, or if the task defines `subtasks`. Otherwise optional.*
+| completionBehaviors | [`completionBehaviorDefinition[]`](#completion-behavior-definitions) | `no` | `no` | An array that contains the task's [completion behaviors](#completion-behavior-definitions).<br>*Required if `routingMode` has not been set to `none`, or if the task defines `subtasks`. Otherwise optional.* |
+| outcomes | [`outcomeDefinition[]`](#outcome-definitions) | `no` | `no` | An array containing the task's possible [outcomes](#outcome-definitions). |
 | annotations | `array`<br>`object` | `depends` | `no` | An array of string-based key/value pairs containing helpful terms used to describe the human task intended purpose, subject areas, or other important qualities.
 | metadata | `object` | `no` | `no` | An object used to provide additional unstructured information about the human task definition. May be used by implementations to define additional functionality. | 
+
+`string`<br>`object` | `yes` | `yes` | The outcome's localized values.<br>If a `string`, the culture-invariant outcome's value.<br>If an `object`, the mappings of localized values to their two-letter ISO 639-1 language names.*Must declare at least one language/value pair.* |
 
 #### Examples
 
@@ -1119,6 +1123,39 @@ completionBehaviors:
       feedback: 
         seen: '${ $CONTEXT.form.data.hasSeenMovie }' 
         comment: '${ $CONTEXT.form.data.comment }'
+```
+
+### Outcome Definitions
+
+#### Description
+
+Defines the outcome of a task.
+
+An outcome can be the task's `default` (fallback), by leaving the `condition` property unset or setting it to `null`. 
+
+A `default` outcome will <u>always</u> apply if its the only declared outcome, or if no conditional outcome matched the context.
+
+#### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| name | `string` | `yes` | `no` | The name of the outcome. <br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
+| condition | `string` | `no` | `yes` | A [runtime expression](#runtime-expression) used to determine whether or not the outcome applies.<br>*If not set, makes the outcome the task's default.*<br>*There can be at most one default outcome.* |
+| value | `string`<br>`object` | `yes` | `yes` | The outcome's localized values.<br>If a `string`, the culture-invariant outcome's value.<br>If an `object`, the mappings of localized values to their two-letter ISO 639-1 language names.*Must declare at least one language/value pair.* |
+
+#### Examples
+
+```yaml
+...
+outcomes:
+  - name: approved
+    condition: ${ $CONTEXT.form.data.approved }
+    value:
+      en: Document Approved 
+      pt: Documento Approvado
+  - name: rejected
+    value: Rejected
+...
 ```
 
 ### Human Tasks
