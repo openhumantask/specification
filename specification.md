@@ -1,4 +1,4 @@
-﻿# Human Task Specification
+﻿# Open Human Task Specification
 
 ## Table of Contents
 
@@ -52,9 +52,7 @@
 
 ## Introduction
 
-The present documents intends to describe the Human Task Specification.
-
-The specification is intended to be a modernization of the (awesome) [WS-HumanTask Specification](http://docs.oasis-open.org/bpel4people/ws-humantask-1.1-spec-cs-01.html).
+The present documents describes the Open Human Task specification, which is intended as a modernization of the AWESOME [WS-HumanTask Specification](http://docs.oasis-open.org/bpel4people/ws-humantask-1.1-spec-cs-01.html).
 
 ## Core concepts
 
