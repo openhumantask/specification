@@ -11,7 +11,7 @@ The Open Human Task DSL is heavily based on the (awesome) [WS-Human Task Specifi
 
 The project is composed of:
 
-- [Specification]() to define and document the OHT DSL.
+- [Specification](specification.md) to define and document the OHT DSL.
 - [Software Development Kits (SDKs)]() to read, write, parse and validate `Human Task Definitions` in multiple languages.
 - [Runtimes](): to manage, serve, render and execute `Human Task Definitions`.
 
