@@ -495,8 +495,6 @@ Defines a human task and configures its behaviors.
 | annotations | `array`<br>`object` | `depends` | `no` | An array of string-based key/value pairs containing helpful terms used to describe the human task intended purpose, subject areas, or other important qualities.
 | metadata | `object` | `no` | `no` | An object used to provide additional unstructured information about the human task definition. May be used by implementations to define additional functionality. | 
 
-`string`<br>`object` | `yes` | `yes` | The outcome's localized values.<br>If a `string`, the culture-invariant outcome's value.<br>If an `object`, the mappings of localized values to their two-letter ISO 639-1 language names.*Must declare at least one language/value pair.* |
-
 #### Examples
 
 ```yaml
