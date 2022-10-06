@@ -1,3 +1,6 @@
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-green.svg?style=flat)](https://github.com/openhumantask/specification/issues)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/openhumantask/specification/blob/master/LICENSE)
+
 # Human Task Specification
 
 ## About
