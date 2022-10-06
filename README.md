@@ -30,9 +30,9 @@ The project is composed of:
 | Latest release | Latest release | Branch | Working branch |
 |----------------|----------------|--------|----------------|
 | **Core** |
-| [Human Task Specification](specification.md) | [v0.1.0]() | [0.1.x]() | [dev]() |
+| [Human Task Specification](specification.md) | [v0.1.0]() | [0.1.x]() | [main]() |
 | **SDKs** |
-| [.NET SDK]() | [v0.1.0]() | [0.1.x]() | [dev]() |
+| [.NET SDK]() | [v0.1.0]() | [0.1.x]() | [main]() |
 
 ## Community
 
