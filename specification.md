@@ -939,7 +939,7 @@ Represents the definition of a notification, which is use to communicate the sta
 | name | `string` | `yes` | `no` | The notification's name.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
 | views | [`viewDefinition[]`](#view-definitions) | `yes` | `yes` | Configures the notification's views.<br>*Must contain at least one [`view definition`](#view-definitions).* |
 | input | `string`<br>`object` | `no` | `yes` | If a `string`, is a [runtime expression](#runtime-expression) used to build the notification's input data based on the human task's data.<br>If an `object`, represents the input data of the notification to produce. [runtime expression](#runtime-expression)s can be used in any and all properties, at whichever depth. 
-| recipients | [`peopleAssignmentDefinition[]`](#people-assignment-definition) | `yes` | `no` | An array that contains the notification's recipients.<br>*Must contain at least one [recipient](#people-assignment-definition).*
+| recipients | [`peopleAssignmentDefinition[]`](#people-assignment-definition) | `no` | `no` | An array that contains the notification's recipients.<br>*If set, must contain at least one [recipient](#people-assignment-definition).*
 
 #### Examples
 
