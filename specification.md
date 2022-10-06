@@ -521,7 +521,7 @@ form:
 notifications:
   - name: task-pending-reminder
     view: openbank.loan-management.notifications.task-pending-reminder:1.0.0
-    input: '${ .input }
+    input: '${ .input }'
     recipients:
       - user: alan
 deadlines:
