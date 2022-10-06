@@ -42,13 +42,13 @@ The project is composed of:
 
 #### Maintainers
 
-  - cdavernas
-  - JBBianchi
+  - [cdavernas](https://github.com/cdavernas)
+  - [JBBianchi](https://github.com/jbbianchi)
   
 #### Reviewers
 
-  - thabart
-  - tsurdilo
+  - [tsurdilo](https://github.com/tsurdilo)
+  - [thabart](https://github.com/thabart)
 
 ### Communications
 
