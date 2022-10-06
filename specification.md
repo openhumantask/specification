@@ -539,7 +539,11 @@ deadlines:
 outcomes:
   - name: approved
     condition: '${ .output.approved and .output.approverId != null }'
+    value: Approved
   - name: rejected
+    value: 
+      en: Approved
+      fr: Approuvé
 annotations:
   tags: loan approval
 metadata:
