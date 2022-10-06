@@ -907,7 +907,7 @@ Represents the object that defines a configures the sub tasks of a [human task](
 | Name | Type | Required | Runtime<br>Expression | Description |
 |------|:----:|:--------:|:---------------------:|-------------|
 | name | `string` | `yes` | `no` | The subtask's name.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.* |
-| taskRef | `string` | `yes` | `yes` | The globally unique identifier of the [task definition](#human-task-definitions) to instanciate |
+| task | `string`<br>[`taskDefinitionReference`](#task-definition-references) | `yes` | `yes` | References the [human task definition](#human-task-definitions) to instanciate.<br>*If a `string`, the globally unique identifier of the [task definition](#human-task-definitions) to instanciate.*<br>If an `object`, the inline [task definition reference](#task-definition-references). |
 | input | `string`<br>`object` | `no` | `yes` | The data to pass as the [subtask](#human-tasks)'s input.<br>If a `string` , is a runtime expression used to build the subtask's input data based on the human task's data.<br>If an `object`, represents the input data of the subtask to create. runtime expressions can be used in any and all properties, at whichever depth.<br>If not set, no input data is supplied to the [subtask](#human-task-definitions). |
 | peopleAssignments | [peopleAssignments](#people-assignments-definitions) | `no` | `yes` | Configures the people to assign the [subtask](#human-task) to.<br>*Overrides the [assignments](#people-assignments-definitions) configured by the [subtask's definition](#human-task-definitions).* |
 
@@ -1258,6 +1258,30 @@ Represents a reference to an user.
 ...
 id: 1234567890
 name: John Smith
+...
+```
+
+### Task Definition References
+
+#### Description
+
+Represents a reference to a task definition.
+
+#### Properties
+
+| Name | Type | Required | Runtime<br>Expression | Description |
+|------|:----:|:--------:|:---------------------:|-------------|
+| name | `string` | `yes` | `yes` | The name of the referenced task definition.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` character.*<br>*Supports [runtime expressions](#runtime-expressions).* |
+| namespace | `string` | `yes` | `yes` | The namespace the referenced task definition belongs to.<br>*Must be lowercase and only contain alphanumeric characters, with the exceptions of the `-` and `.` characters.*<br>*Supports [runtime expressions](#runtime-expressions).* |
+| version | `string` | `no` | `yes` | The [semantic version](https://semver.org/) of the human task definition.<br>*Defaults to `latest`.<br>*Supports [runtime expressions](#runtime-expressions).* |
+
+#### Examples
+
+```yaml
+...
+name: review-application
+namespace: openbank.human-resources.jobs
+version: 1.7.9
 ...
 ```
 
