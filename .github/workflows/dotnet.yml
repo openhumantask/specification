@@ -1,0 +1,28 @@
+name: Publish Packages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Install dependencies
+      run: dotnet restore "./OpenHumanTask.Sdk.sln"
+    - name: Build
+      run: dotnet build "./OpenHumanTask.Sdk.sln" --configuration Release --no-restore
+    #- name: Test
+    #  run: dotnet test "./OpenHumanTask.Sdk.sln" --no-restore --verbosity detailed
+    - name: Push
+      uses: brandedoutcast/publish-nuget@v2.5.2
+      with:
+        PROJECT_FILE_PATH: src/OpenHumanTask.Sdk/OpenHumanTask.Sdk.csproj
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        
